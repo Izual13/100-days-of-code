@@ -1,6 +1,4 @@
-(ns  hdoc.d1
-  (:require 
-   [clojure.data.json :as json]))
+(ns  hdoc.d1)
 
 ;Breaking the Records
 
