@@ -1,5 +1,5 @@
 {:deps {
-        org.clojure/clojure         {:mvn/version "1.10.0-RC5"}
+        org.clojure/clojure         {:mvn/version "1.10.0"}
         }
  :aliases {
            :repl {
