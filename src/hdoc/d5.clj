@@ -62,3 +62,18 @@
 
 (assert (= 1 (formingMagicSquare [[4 9 2] [3 5 7] [8 1 5]])))
 (assert (= 4 (formingMagicSquare [[4 8 2] [4 5 7] [6 1 6]])))
+
+
+
+
+
+
+;Sock Merchant
+
+(defn sockMerchant [ar & n] 
+  (reduce + (map #(int (Math/floor (/ (last %) 2))) (frequencies ar))))
+
+(sockMerchant [10 20 20 10 10 30 50 10 20])
+
+(assert (= 3 (sockMerchant [10 20 20 10 10 30 50 10 20])))
+(assert (= 4 (sockMerchant [1 1 3 1 2 1 3 3 3 3])))
