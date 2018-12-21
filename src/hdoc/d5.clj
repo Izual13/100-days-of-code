@@ -3,7 +3,18 @@
 ;Forming a Magic Square
 
 (def default-square [8 3 4 1 5 9 6 7 2])
-(def default-rsquare [8 1 6 3 5 7 4 9 2])
+
+(defn transposition [a] 
+  (into [] (map #(get a 
+                      (case % 
+                        1 3
+                        2 6
+                        3 1
+                        5 7
+                        6 2
+                        7 5
+                        %)) (range 0 9))))
+
 
 ; 8 3 4             
 ; 1 5 9
@@ -23,7 +34,7 @@
   (into [] (map #(get-value s % k) (range 0 9))))
 
 (def all-permutations (concat (into [] (map #(rotate-square default-square %1)) (range 0 4))
-        (into [] (map #(rotate-square default-rsquare %1)) (range 0 4))))
+        (into [] (map #(rotate-square (transposition default-square) %1)) (range 0 4))))
 
 (defn miscalculation [a1 a2] 
   (loop [a1 a1
