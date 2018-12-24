@@ -5,8 +5,7 @@
 ;Counting Valleys
 
 (defn countingValleys [n s]
-  (def array (into [] s))
-  (loop [s array
+  (loop [s (seq s)
          count 0
          level 0]
     (println "count: " count)
@@ -16,7 +15,7 @@
       count
       (let [f (first s)
             up (= f \U)]
-      (recur (rest s)  
+      (recur (next s)  
              (if (and (= level -1) up) (inc count) count)
              (if up (inc level) (dec level)))))))
 
