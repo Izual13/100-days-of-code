@@ -4,27 +4,25 @@
 
 ;Climbing the Leaderboard
 
-(defn get-rating [scores score] 
-  (println scores)
-  (println score)
-  (loop [m      scores
-         result (inc (count m))]
-    (println "result: " result)
-    (println "array: " m)
-    (if (or (empty? m) (> (last m) score ))
-      [m result]
-      (recur (drop-last m) (dec result)))))
+
 
 (defn climbingLeaderboard [scores alice]
-  (println scores)
-  (loop [sc       (seq (distinct  scores))
-         alice-sc (seq alice)
-         results  []]
-    (if (empty? alice-sc)
-      results
-      (let [tmp         (get-rating sc (first alice-sc))
-            new-results (conj results (last tmp))]
-        (recur (first tmp) (next alice-sc) new-results)))))
+  (def uniq  (dedupe scores))
+  (def length (count uniq))
+
+  (loop [i (- length 1)
+         result []
+         a alice]
+    (if (empty? a)
+      result
+      (let [f (first a)
+            current (nth uniq i)]
+        (if (< f current)
+          (recur i (conj result (+ i 2)) (rest a))
+          (if (= i 0)
+            (recur i (conj result 1) (rest a))
+            (recur (dec i) result a)))))))
+
 
 (climbingLeaderboard [100 90 90 80 75 60] [50 65 77 90 102])
 
@@ -35,6 +33,6 @@
 
 (time (conj alice-test1 result-test1))
 
-(assert (= [6 5 4 2 1] (climbingLeaderboard [100 90 90 80 75 60] [50 65 77 90 102])))
+(assert (= [6 4 2 1] (climbingLeaderboard [100 100 50 40 40 20 10] [5 25 50 120])))
 
 (assert (= result-test1 (climbingLeaderboard score-test1 alice-test1)))
