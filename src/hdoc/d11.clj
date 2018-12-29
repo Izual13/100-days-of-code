@@ -4,25 +4,14 @@
 
 ;Climbing the Leaderboard
 
-
-
 (defn climbingLeaderboard [scores alice]
-  (def uniq  (dedupe scores))
-  (def length (count uniq))
-  (def alice-length (count alice))
+  (def fcompare #(compare %2 %1))
+  (def uniq (vec (sort fcompare (into #{} scores))))
 
-  (loop [result []
-         i      0]
-    (let [ next-i (inc i)]
-      (if (= i alice-length)
-        result
-        (let [f   (nth  alice i)
-              idx (java.util.Collections/binarySearch uniq f #(compare %2 %1))
-              idx (if (< idx 0) (Math/abs idx) (inc idx))
-              p   (println "idx: " idx)
-              p   (println "length: " length)
-              p   (println "     "  (Math/abs idx))]
-          (recur (conj result idx) next-i))))))
+  (map (fn [x] (let [f   x
+                     idx (java.util.Collections/binarySearch uniq f fcompare)
+                     idx (if (< idx 0) (Math/abs idx) (inc idx))]
+                 idx)) alice))
 
 
 (climbingLeaderboard [100 90 90 80 75 60] [50 65 77 90 102])
