@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as str]))
 
-;The Hurdle Race
+;Designer PDF Viewer
 
 (def abc (into {} (map-indexed (fn [x y] [y x]) "abcdefghijklmnopqrstuvwxyz")))
 
