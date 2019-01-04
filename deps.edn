@@ -4,7 +4,7 @@
  :aliases {
            :repl {
                   :extra-deps {
-                               cider/cider-nrepl {:mvn/version "0.18.0"}
+                               cider/cider-nrepl {:mvn/version "0.19.0"}
                                nrepl/nrepl       {:mvn/version "0.5.3"}
                                }
                   :main-opts  [
