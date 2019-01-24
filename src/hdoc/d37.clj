@@ -19,30 +19,26 @@
         idx (if (< idx 0) (Math/abs idx) (inc idx))]
     idx))
 
-
 (assert (= 2 (find-greater [7 4 3] 6)))
 (assert (= 2 (find-pivot "0125330")))
 
 (defn biggerIsGreater [w]
-  (let [pivot        (find-pivot w)
-        greater (if (not= pivot -1) (+ pivot -1 (find-greater (vec (subs w (inc pivot))) (get w pivot))) -1)
+  (let [w            (vec w)
+        pivot        (find-pivot w)
+        x1           (get w pivot)
         next-pivot   (inc pivot)
+        greater      (if (not= pivot -1) (+ pivot -1 (find-greater (subvec w next-pivot) x1)) -1)
         next-greater (inc greater)]
     (if (= greater -1) "no answer"
-        (let [
-              x1 (subs w pivot next-pivot)
-              x2 (subs w greater next-greater)]
-          (println "x1: " x1 "x2: " x2)
-          (println "pivot: " pivot "; greater: " greater)
-          (apply str (concat (subs w 0 pivot)
-                             x2 
+        (let [              x2 (get w greater)]
+          (apply str (concat (subvec w 0 pivot)
+                             [x2] 
                              (reverse (concat
-                                       (subs w next-pivot greater)
-                                       x1
-                                       (subs w next-greater)))))
+                                       (subvec w next-pivot greater)
+                                       [x1]
+                                       (subvec w next-greater)))))
           ))))
 
-(biggerIsGreater "zalqxykemvzzgaka")
 
 (assert (= 2 (find-pivot "dhck")))
 
