@@ -23,21 +23,23 @@
 (assert (= 2 (find-pivot "0125330")))
 
 (defn biggerIsGreater [w]
-  (let [w            (vec w)
-        pivot        (find-pivot w)
-        x1           (get w pivot)
-        next-pivot   (inc pivot)
-        greater      (if (not= pivot -1) (+ pivot -1 (find-greater (subvec w next-pivot) x1)) -1)
-        next-greater (inc greater)]
-    (if (= greater -1) "no answer"
-        (let [              x2 (get w greater)]
-          (apply str (concat (subvec w 0 pivot)
-                             [x2] 
-                             (reverse (concat
-                                       (subvec w next-pivot greater)
-                                       [x1]
-                                       (subvec w next-greater)))))
-          ))))
+  (let [w     (vec w)
+        pivot (find-pivot w)]
+    (if (= pivot -1) "no answer"
+        (let [              
+              x1           (get w pivot)
+              next-pivot   (inc pivot)
+              sub-w        (subvec w pivot)
+              greater      (if (not= pivot -1) (+ pivot -1 (find-greater (drop 1 sub-w)   x1)) -1)
+              next-greater (inc greater)
+              x2           (get w greater)
+              w            (-> w
+                               (assoc pivot x2)
+                               (assoc greater x1))]
+          (apply str (concat (take next-pivot w)
+                             (reverse (drop next-pivot w))))))))
+
+
 
 
 (assert (= 2 (find-pivot "dhck")))
