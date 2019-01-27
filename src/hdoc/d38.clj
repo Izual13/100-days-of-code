@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as str]))
 
-;Bigger is Greater
+;Left Rotation
 
 (defn rotate [v d]
   (let [length (count v)]
