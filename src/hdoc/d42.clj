@@ -38,24 +38,84 @@
   (println "<- print-deque")
   )
 
+
+(defn remove-right [array deque value]
+  (loop [last (get array (.peekLast deque))]
+    (if (or (nil? last) (> last value))
+      deque
+      (let [rm (.pollLast deque)]
+        (recur (get array (.peekLast deque)))))))
+
+(defn remove-left [deque value]
+  (loop [first (.peekFirst deque)]
+    (if (or (nil? first) (>= first value))
+      deque
+      (let [rm (.pollFirst deque)]
+        (recur (.peekFirst deque))))))
+
+
+(assert (= [10 7 8 8] (windowMax [10 5 2 7 8 7] 3)))
+
+
+(let  [d (deque 5)]
+  (.addLast d 0)
+  (.addLast d 1)
+  (remove-right [10 4] d 3)
+  (assert (= 1 (.pollLast d)))
+  (assert (= 0 (.pollLast d)))
+  )
+
+(let  [d (deque 5)]
+  (.addLast d 0)
+  (.addLast d 1)
+  (remove-right [10 4] d 5)
+  (assert (= 0 (.pollLast d)))
+  (assert (nil? (.pollLast d)))
+  )
+
+(let  [d (deque 5)]
+  (.addLast d 0)
+  (.addLast d 1)
+  (.addLast d 2)
+  (.addLast d 3)
+  (remove-left d 1)
+  (assert (= 3 (.pollLast d)))
+  (assert (= 2 (.pollLast d)))
+  (assert (= 1 (.pollLast d)))
+  (assert (nil? (.pollLast d)))
+  )
+
+(let  [d (deque 5)]
+  (.addLast d 0)
+  (.addLast d 1)
+  (remove-left d 1)
+  (assert (= 1 (.pollLast d)))
+  (assert (nil? (.pollLast d)))
+  )
+
+
 (defn windowMax [n k]
-  (let [deque (deque k)]
+  (let [deque (deque k)
+        result (transient [])]
     (doseq [i (range k)] 
       (let [last  (get n (.peekLast deque))
             value (get n i)]
         (println "last: " last "; value: " value)
         (if (or (nil? last) (> last value))
           (.addLast deque i)
-          (do (.clear deque)
-              (.addLast deque i))          )))
+          (do (remove-right n deque value)
+              (.addLast deque i)))))
     
-    (print-deque deque)
+    ; (print-deque deque)
     
     (doseq [i (range k (count n))] 
+      (conj! result i)
       (println (get n i)))
+    (persistent! result)
     ))
 
 (windowMax [10 5 2 7 8 7] 3)
+(windowMax [10 2 5 7 8 7] 3)
 
 
 (doseq [x (range 10)]
