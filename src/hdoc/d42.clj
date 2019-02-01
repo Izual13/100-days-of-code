@@ -15,18 +15,6 @@
 (defn deque [n] 
   (java.util.ArrayDeque. n))
 
-(let [deque (deque 5)]
-  (.addFirst deque 1)
-  (.addFirst deque 6)
-  ; (.addFirst deque 50)
-  (.peekLast deque)
-  (.peekLast deque)
-  (.peekLast deque)
-  (.peekLast deque)
-  (.peekLast deque)
-  (print-deque deque)
-  )
-
 (defn print-deque [d] 
   (println "print-deque ->")
   (loop [first (.peekFirst d)]
@@ -37,7 +25,6 @@
              )))
   (println "<- print-deque")
   )
-
 
 (defn remove-right [array deque value]
   (loop [last (get array (.peekLast deque))]
@@ -100,7 +87,6 @@
     (doseq [i (range k)] 
       (let [last  (get n (.peekLast deque))
             value (get n i)]
-        (println "last: " last "; value: " value)
         (if (or (nil? last) (> last value))
           (.addLast deque i)
           (do (remove-right n deque value)
@@ -109,17 +95,17 @@
     ; (print-deque deque)
     
     (doseq [i (range k (count n))] 
-      (conj! result i)
-      (println (get n i)))
+      (conj! result (get n (.peekFirst deque)))
+      (remove-left deque (inc (- i k)))
+      (remove-right n deque (get n i))
+      (.addLast deque i))
+    (conj! result (get n (.peekFirst deque)))
     (persistent! result)
     ))
 
 (windowMax [10 5 2 7 8 7] 3)
 (windowMax [10 2 5 7 8 7] 3)
 
-
-(doseq [x (range 10)]
-  (println x))
-
 (assert (= [10 7 8 8] (windowMax [10 5 2 7 8 7] 3)))
+(assert (= [5 4 6 6 6 4 4 4 5] (windowMax [5 3 4 1 6 2 2 4 3 1 5] 3)))
 
