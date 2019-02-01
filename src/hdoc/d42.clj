@@ -1,5 +1,6 @@
 (ns  hdoc.d42
   (:require
+   [clojure.test :refer :all]
    [clojure.string :as str]))
 
 ;Given an array of integers and a number k, where 1 <= k <= length of the array, compute the maximum values of each subarray of length k.
@@ -39,10 +40,6 @@
       deque
       (let [rm (.pollFirst deque)]
         (recur (.peekFirst deque))))))
-
-
-(assert (= [10 7 8 8] (windowMax [10 5 2 7 8 7] 3)))
-
 
 (let  [d (deque 5)]
   (.addLast d 0)
@@ -91,8 +88,6 @@
           (.addLast deque i)
           (do (remove-right n deque value)
               (.addLast deque i)))))
-    
-    ; (print-deque deque)
     
     (doseq [i (range k (count n))] 
       (conj! result (get n (.peekFirst deque)))
