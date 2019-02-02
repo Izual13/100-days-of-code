@@ -10,13 +10,27 @@
 
 (defprotocol Node-interface 
   (next [_])
-  (value [_]))
+  (value [_])
+  (set [this n]))
 
-(defrecord Node [value ^Node node]
+(deftype Node [value ^{:volatile-mutable true} node]
   Node-interface
   (next [_] node)
-  (value [_] value))
+  (value [_] value)
+  (set [_ n] (set! node n)))
 
+
+(defn find-last [node k]
+  (loop [i 1
+         node node
+         result nil]
+    (if (nil? node) result
+        (recur (inc i) (.next node) (if (and (= (mod (inc i) k) 0) (not (nil? (.next node)))) node result)))))
+
+
+;1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
+; k = 2 -> 6 - 1
+; k = 4 -> 4 - 1 
 
 (let [f (Node. 7 nil)
       f (Node. 6 f)
@@ -26,10 +40,33 @@
       f (Node. 2 f)
       f (Node. 1 f)]
     ; (loop [i 0])
-  (.next f)
+  (assert (= 5 (.value (find-last f 2)))))
+
+(let [f (Node. 7 nil)
+      f (Node. 6 f)
+      f (Node. 5 f)
+      f (Node. 4 f)
+      f (Node. 3 f)
+      f (Node. 2 f)
+      f (Node. 1 f)]
+  (assert (= 3 (.value (find-last f 4)))))
+
+(defn remove-next-node [node]
+  (.set node (.next (.next node))))
+
+(let [f (Node. 7 nil)
+      f (Node. 6 f)
+      f (Node. 5 f)
+      f (Node. 4 f)
+      f (Node. 3 f)
+      f (Node. 2 f)
+      f (Node. 1 f)]
+    ; (loop [i 0])
+  (remove-next-node  (find-last f 4))
+  (loop [f f] 
+    (if (nil? f) f
+        (let [next (.next f)]
+          (println (.value f))
+          (recur next))))
   )
-
-
-
-(assert (= [5 4 6 6 6 4 4 4 5] (windowMax [5 3 4 1 6 2 2 4 3 1 5] 3)))
 
