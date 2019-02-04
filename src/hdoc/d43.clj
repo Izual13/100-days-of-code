@@ -52,7 +52,26 @@
   (assert (= 3 (.value (find-last f 4)))))
 
 (defn remove-next-node [node]
-  (.set node (.next (.next node))))
+  (let [next-node (.next node)
+        next-node (if (nil? next-node) nil (.next next-node))]
+  (.set node next-node)))
+
+(let [f (Node. 3 nil)
+      f (Node. 2 f)
+      f (Node. 1 f)]
+  (remove-next-node f)
+  (assert (= 1 (.value f)))
+  (assert (= 3 (.value (.next f)))))
+
+(let [f (Node. 2 nil)
+      f (Node. 1 f)]
+  (remove-next-node f)
+  (assert (= 1 (.value f)))
+  (assert (= nil (.next f))))
+
+(let [f (Node. 1 nil)]
+  (remove-next-node f)
+  (assert (= 1 (.value f))))
 
 (let [f (Node. 7 nil)
       f (Node. 6 f)
