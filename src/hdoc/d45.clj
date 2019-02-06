@@ -5,43 +5,30 @@
 
 ;Cavity Map
 
-(defn parse-int [x]
-  (loop [result [(mod x 10)]
-         reminder (int (Math/floor (/ x 10)))]
-    (if (= reminder 0)
-      (vec result)
-      (recur (cons (mod reminder 10) result) (int (Math/floor (/ reminder 10)))))))
+(defn parse-int [s] (Integer/parseInt (str s)))
 
-
-(assert (= [1 1 1 2] (parse-int 1112)))
-
-(defn parse-ints [grid] 
-  (vec (for [i grid] 
-    (parse-int i))))
-
-(assert (= [[1 1 1 2][1 9 1 2][1 8 9 2][1 2 3 4]] (parse-ints [1112 1912 1892 1234])))
+(assert (= 1 (parse-int (get "123" 0))))
 
 (defn cavityMap [grid]
-  (let [grid (parse-ints grid)
-        n (count grid)]
-    (println 123)
-    (vec (for [i (range 0 n)
-               j (range 0 n)]
-           (if (or (= i 0) (= j 0) (= j (dec n)) (= j (dec n)))
-             (get (get grid i) j)
-             (let [r1    (get grid (dec i))
-                   r2    (get grid i)
-                   r3    (get grid (inc i))
-                   value (get (get grid i) j)]
-               (println r1 r2 r3 value)
-               (if (and  (> value (get r1 j))
-                         (> value (get r2 (dec j)))
-                         (> value (get r2 (inc j)))
-                         (> value (get r3 j)))     "X"                    value)        
-               ))))))
+  (let [n (count grid)]
+    (vec (for [i (range 0 n)]
+           (apply str (for [j (range 0 (count (get grid i)))]
+                        (if (or (= i 0) (= j 0) (= i (dec n)) (= j (dec n)) (= \space (get (get grid i) j)))
+                          (get (get grid i) j)
+                          (let [r1    (get grid (dec i))
+                                r2    (get grid i)
+                                r3    (get grid (inc i))
+                                value (parse-int (get (get grid i) j))]
+                            (if (and  (> value (parse-int (get r1 j)))
+                                      (> value (parse-int (get r2 (dec j))))
+                                      (> value (parse-int (get r2 (inc j))))
+                                      (> value (parse-int (get r3 j))))     "X"                    value)        
+                            ))))))))
 
 
 
-(get (parse-ints [1112]) 0)
+(assert (= ["1112" "1X12" "18X2" "1234"] (cavityMap ["1112" "1912" "1892" "1234"])))
+(assert (= ["1 2" "1 2"] (cavityMap ["1 2" "1 2"])))
+(assert (= ["179443854" "961X21369" "164139922" "96X633951" "812882578" "25782X163" "8124385X7" "176656233" "485773814"] 
+           (cavityMap ["179443854" "961621369" "164139922" "968633951" "812882578" "257829163" "812438597" "176656233" "485773814"])))
 
-(cavityMap [1112 1912 1892 1234])
