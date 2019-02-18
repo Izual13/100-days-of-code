@@ -12,24 +12,17 @@
     (if (>= n (bit-shift-left 1 bit)) bit
       (recur (dec bit)))))
 
-(find-higher-bit 10)
-(find-higher-bit 8)
-(bit-shift-left 1 3)
-
-
-
 (defn find-numbers [n]
   (let [xor (apply bit-xor n)
-        xor2 (apply bit-xor (map #(bit-shift-left % 1) n))
-        xor3 (bit-xor xor (bit-and xor2 (- (bit-shift-left 1 (inc (find-higher-bit xor))) 1)))] [xor3 (bit-xor xor xor3)]))
+        higher-bit (bit-shift-left 1 (find-higher-bit xor))]
+    (loop [n (seq n) x 0 y 0]
+      (cond
+        (empty? n) [x y]
+        (= 0 (bit-and higher-bit (first n))) (recur (next n) (bit-xor x (first n)) y)
+        :else (recur (next n) x (bit-xor y (first n)))))))
 
-(bit-shift-right 8 1)
-(bit-shift-right 24 1)
 
-
-(find-numbers [2, 4, 6, 8, 10, 2, 6, 10])
-(find-numbers [2, 5, 6, 11, 10, 2, 6, 10])
-
-(assert (= 9 (queensAttack 4 0 4 4 [])))
+(assert (= [4 8] (find-numbers [2, 4, 6, 8, 10, 2, 6, 10])))
+(assert (= [5 7] (find-numbers [2, 5, 6, 7, 10, 2, 6, 10])))
 
 
