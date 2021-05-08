@@ -1,10 +1,10 @@
 {:deps {
-        org.clojure/clojure         {:mvn/version "1.10.1"}
+        org.clojure/clojure         {:mvn/version "1.10.3"}
         }
  :aliases {
            :repl {
                   :extra-deps {
-                               cider/cider-nrepl {:mvn/version "0.25.5"}
+                               cider/cider-nrepl {:mvn/version "0.26.0"}
                                nrepl/nrepl       {:mvn/version "0.8.3"}
                                }
                   :main-opts  [
