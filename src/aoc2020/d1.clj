@@ -1,5 +1,5 @@
 (ns  aoc2020.d1
-  (:require [clojure.java.io :as io]
+  (:require 
             [clojure.string :as str]))
 
 (def input
