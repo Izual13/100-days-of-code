@@ -15,3 +15,6 @@ pom.xml.asc
 .idea/
 .directory
 ws.code-workspace
+.calva/
+.clj-kondo/
+.lsp/
