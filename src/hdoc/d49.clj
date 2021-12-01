@@ -15,7 +15,7 @@
 
 (assert (= 9 (all-attacks 4 4 4)))
 
-(defn queensAttack [n k r_q c_q obstacles]
+(defn queensAttack [n _ r_q c_q _]
   (let [all (all-attacks r_q c_q n)] all))
  
 (queensAttack 5 3 4 3 [[5 5] [4 2] [2 3]])

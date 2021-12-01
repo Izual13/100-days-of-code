@@ -37,7 +37,7 @@
 (def value (/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 4 5)))))
    (* 3 (- 6 2) (- 2 7))))
 
-(assert (= (/ -37 150)) value)
+(assert (= (/ -37 150) value))
 
 ;1.3
 (defn sum-of-squares [a b c] 
