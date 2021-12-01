@@ -5,7 +5,7 @@
 (def input
   (map #(Integer/parseInt %)
        (str/split-lines
-        (slurp "resources/input1.txt"))))
+        (slurp "resources/aoc2020/input1.txt"))))
 
 (set
  (for [x input 
