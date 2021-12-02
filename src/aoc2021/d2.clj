@@ -22,7 +22,7 @@
            new-d (nth next 0)
            new-n (Integer/parseInt (nth next 1))
            r (rest input)
-           p (println directional number x y)
+           _ (println directional number x y)
            ]
        (cond (= directional "forward") (dive new-d new-n r (+ x number) y)
              (= directional "down") (dive new-d new-n r x (+ y number))
@@ -37,7 +37,7 @@
                      (= directional "down") (+ y number)
                      :else y)
          new-d (if (= directional "forward") (+ (* y number) d) d)
-         p (comment println directional number new-x new-y new-d)]
+         _ (comment println directional number new-x new-y new-d)]
      
      (if (empty? input)
        (* new-d new-x)
