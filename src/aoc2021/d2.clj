@@ -1,4 +1,4 @@
-(ns  aoc2021.d1
+(ns  aoc2021.d2
   (:require [clojure.string :as str]))
 
 (def input-from-file
