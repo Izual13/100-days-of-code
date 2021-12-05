@@ -22,10 +22,10 @@
 
 (assert (= 13 (max-element-in-matrix [[1 2 3] [3 4 5 2 3 5] [13]])))
 
-(defn count-element-in-matrix [matrix element] (count (filter #(= % element) (flatten matrix))))
+(defn count-elements-more-than-2 [matrix] (count (filter #(>= % 2) (flatten matrix))))
 
-(assert (= 3 (count-element-in-matrix [[1 2 3] [3 4 5 2 3 5] [13]] 3)))
-(assert (= 1 (count-element-in-matrix [[1 2 3] [3 4 5 2 3 5] [13]] 4)))
+(assert (= 9 (count-elements-more-than-2 [[1 2 3] [3 4 5 2 3 5] [13]])))
+(assert (= 1 (count-elements-more-than-2 [[1 2 1] [1 1 1 1 1 1] [1]])))
 
 (max-by-coordinate input-from-file-test [:y2 :y1])
 
@@ -39,7 +39,6 @@
 (defn update-matrix [matrix coordinates]
   (let [x (sort [(:x1 coordinates) (:x2 coordinates)])
         y (sort [(:y1 coordinates) (:y2 coordinates)])]
-    (println "coordinates" coordinates)
     (cond (= (first x) (last x)) (loop [i (first y) m matrix]
                                    (if (> i (last y))
                                      m
@@ -83,18 +82,13 @@
                               (if (empty? lines)
                                 matrix
                                 (let [line (first lines)] (recur (rest lines) (update-matrix matrix line)))))
-                 _ (println max-x)
-                 _ (println max-y)
-                 max-element-in-matrix (max-element-in-matrix new-matrix)
-
-                 _ (println "max-element-in-matrix" max-element-in-matrix)
-                 result (count-element-in-matrix new-matrix max-element-in-matrix)]
+                 result (count-elements-more-than-2 new-matrix)]
              result)))
 
 (part1 input-from-file-test)
 
 (assert (= 5 (part1 input-from-file-test)))
-(assert (= 15 (part1 input-from-file)))
+(assert (= 5306 (part1 input-from-file)))
 
 
 
