@@ -36,6 +36,7 @@
 
 (build-matrix 5 5)
 
+
 (defn update-matrix [matrix coordinates]
   (let [x (sort [(:x1 coordinates) (:x2 coordinates)])
         y (sort [(:y1 coordinates) (:y2 coordinates)])]
@@ -44,28 +45,19 @@
                                      m
                                      (let [x (first x)
                                            r (get matrix i)
-                                           ;_ (println "r" r)
                                            r (assoc r x (inc (get r x)))
-                                           ;_ (println "new r" r)
                                            ]
                                        (recur (inc i) (assoc m i r)))))
           (= (first y) (last y)) (let [r (get matrix (first y))
                                        last-x (last x)
-                                       ;_ (println "matrix" matrix)
-                                       ;_ (println "r" r "last-x" last-x)
                                        r (loop [i (first x) r r]
-                                           ;(println "i:" i "r:" r)
                                            (if (> i last-x)
                                              r
                                              (recur (inc i) (assoc r i (inc (get r i))))))
-                                       ;_ (println r)
                                        ]
                                    (assoc matrix (first y) r))
           :else matrix)))
 
-
-(update-matrix [[0 0 0 0] [0 0 0 0]] {:x1 0, :y1 0, :x2 0, :y2 1})
-(update-matrix [[1 2 3 4] [5 6 7 8]] {:x1 3 :y1 0, :x2 0, :y2 0})
 
 (assert (= [[0 0 0 0] [0 0 0 0]] (update-matrix [[0 0 0 0] [0 0 0 0]] {:x1 1, :y1 2, :x2 3, :y2 4})))
 (assert (= [[1 0 0 0] [1 0 0 0]] (update-matrix [[0 0 0 0] [0 0 0 0]] {:x1 0, :y1 0, :x2 0, :y2 1})))
@@ -73,6 +65,50 @@
 (assert (= [[0 0 0 0] [0 1 1 0] [0 0 0 0] [0 0 0 0]] (update-matrix [[0 0 0 0] [0 0 0 0] [0 0 0 0] [0 0 0 0]] {:x1 2, :y1 1, :x2 1, :y2 1})))
 
 
+(defn update-matrix-diagonal [matrix coordinates]
+  (let [start-x (:x1 coordinates)
+        end-x (:x2 coordinates)
+        start-y (:y1 coordinates)
+        end-y (:y2 coordinates)
+        x-move (if (<= start-x end-x) inc dec)
+        y-move (if (<= start-y end-y) inc dec)
+        length (Math/abs (- end-x start-x))]
+    (loop [i 0 x start-x y start-y m matrix]
+      (if (> i length)
+        m
+        (let [r (get m y)
+              e (get r x)
+              new-r (assoc r x (inc e))
+              ]
+          (recur (inc i) (x-move x) (y-move y) (assoc m y new-r)))))))
+
+
+(assert (= [[1 0 0 0] [0 1 0 0] [0 0 1 0] [0 0 0 1]] (update-matrix-diagonal [[0 0 0 0] [0 0 0 0] [0 0 0 0] [0 0 0 0]] {:x1 0, :y1 0, :x2 3, :y2 3})))
+(assert (= [[0 0 0 0] [0 1 0 0] [0 0 1 0] [0 0 0 1]] (update-matrix-diagonal [[0 0 0 0] [0 0 0 0] [0 0 0 0] [0 0 0 0]] {:x1 1, :y1 1, :x2 3, :y2 3})))
+(assert (= [[0 0 0 1] [0 0 1 0] [0 1 0 0] [1 0 0 0]] (update-matrix-diagonal [[0 0 0 0] [0 0 0 0] [0 0 0 0] [0 0 0 0]] {:x1 0 :y1 3, :x2 3, :y2 0})))
+(assert (= [[0 0 1 0 0 0 0] [0 0 0 1 0 0 0] [0 0 0 0 1 0 0] [0 0 0 0 0 1 0] [0 0 0 0 0 0 1] [0 0 0 0 0 0 0] [0 0 0 0 0 0 0]] (update-matrix-diagonal (build-matrix 6 6) {:x1 6, :y1 4, :x2 2, :y2 0})))
+
+
+(defn update-matrix-extended [matrix coordinates]
+  (let [x (sort [(:x1 coordinates) (:x2 coordinates)])
+        y (sort [(:y1 coordinates) (:y2 coordinates)])]
+    (cond (= (first x) (last x)) (loop [i (first y) m matrix]
+                                   (if (> i (last y))
+                                     m
+                                     (let [x (first x)
+                                           r (get matrix i)
+                                           r (assoc r x (inc (get r x)))
+                                           ]
+                                       (recur (inc i) (assoc m i r)))))
+          (= (first y) (last y)) (let [r (get matrix (first y))
+                                       last-x (last x)
+                                       r (loop [i (first x) r r]
+                                           (if (> i last-x)
+                                             r
+                                             (recur (inc i) (assoc r i (inc (get r i))))))
+                                       ]
+                                   (assoc matrix (first y) r))
+          :else (update-matrix-diagonal matrix coordinates))))
 
 (defn part1
   ([input] (let [max-x (max-by-coordinate input [:x1 :x2])
@@ -91,4 +127,17 @@
 (assert (= 5306 (part1 input-from-file)))
 
 
+(defn part2
+  ([input] (let [max-x (max-by-coordinate input [:x1 :x2])
+                 max-y (max-by-coordinate input [:y1 :y2])
+                 matrix (build-matrix max-x  max-y)
+                 new-matrix (loop [lines input matrix matrix]
+                              (if (empty? lines)
+                                matrix
+                                (let [line (first lines)] (recur (rest lines) (update-matrix-extended matrix line)))))
+                 result (count-elements-more-than-2 new-matrix)]
+             result)))
+
+(assert (= 12 (part2 input-from-file-test)))
+(assert (= 17787 (part2 input-from-file)))
 
