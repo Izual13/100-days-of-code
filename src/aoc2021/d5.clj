@@ -11,10 +11,9 @@
        (str/split-lines
         (slurp "resources/aoc2021/day5_1"))))
 
-(:y1 (first input-from-file-test))
 
-(let [[_ x1 y1 x2 y2] (re-matches #"(\d+),(\d+) -> (\d+),(\d+)" "505,796 -> 505,244")] (println x1 x2 y1 y2))
-
+(assert (= 9 (:y1 (first input-from-file-test))))
+(assert (= ["505" "505" "796" "244"] (let [[_ x1 y1 x2 y2] (re-matches #"(\d+),(\d+) -> (\d+),(\d+)" "505,796 -> 505,244")] [x1 x2 y1 y2])))
 
 (defn max-by-coordinate [input [coordinate1 coordinate2]] (apply max (flatten (map (fn [row] [(coordinate1 row) (coordinate2 row)]) input))))
 
@@ -27,15 +26,11 @@
 (assert (= 9 (count-elements-more-than-2 [[1 2 3] [3 4 5 2 3 5] [13]])))
 (assert (= 1 (count-elements-more-than-2 [[1 2 1] [1 1 1 1 1 1] [1]])))
 
-(max-by-coordinate input-from-file-test [:y2 :y1])
-
-
-(apply max (flatten (map (fn [row] [(:x1 row) (:x2 row)]) input-from-file-test)))
+(assert (= 9 (max-by-coordinate input-from-file-test [:y2 :y1])))
 
 (defn build-matrix [x y] (vec (for [_ (range (inc x))] (vec (take (inc y) (repeat 0))))))
 
-(build-matrix 5 5)
-
+(assert (= [[0 0 0] [0 0 0] [0 0 0]] (build-matrix 2 2)))
 
 (defn update-matrix [matrix coordinates]
   (let [x (sort [(:x1 coordinates) (:x2 coordinates)])
@@ -120,8 +115,6 @@
                                 (let [line (first lines)] (recur (rest lines) (update-matrix matrix line)))))
                  result (count-elements-more-than-2 new-matrix)]
              result)))
-
-(part1 input-from-file-test)
 
 (assert (= 5 (part1 input-from-file-test)))
 (assert (= 5306 (part1 input-from-file)))
