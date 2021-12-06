@@ -40,19 +40,15 @@
   ([input] (loop [i 0 input (frequencies input)] 
              (if (= i 256) 
                (apply + (map (fn [[_ n]] n) input))
-               (let [count-0 (get input 0)
-                     count-0 (if (nil? count-0) 0 count-0)
+               (let [count-0 (get input 0 0)
                      result (assoc input 0 0)
                      result (loop [j 1 result result]
                               (if (= j 9)
                                 result
-                                (let [e (get result j)]
-                                  (if (nil? e)
-                                    (recur (inc j) (assoc result (dec j) 0))
-                                    (recur (inc j) (assoc result (dec j) e))))))
+                                (let [e (get result j 0)]
+                                    (recur (inc j) (assoc result (dec j) e)))))
 
-                     count-6 (get result 6)
-                     count-6 (if (nil? count-6) 0 count-6) 
+                     count-6 (get result 6 0)
                      result (assoc result 6 (+ count-0 count-6))
                      result (assoc result 8 count-0)
                      ] 
