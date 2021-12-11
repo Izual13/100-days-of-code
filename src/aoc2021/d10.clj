@@ -11,38 +11,72 @@
   (->> (slurp "resources/aoc2021/day10_1")
        (str/split-lines)))
 
-(defn check-brackets [brackets]
+(defn get-first-invalid-bracket [brackets]
   (loop [b (vec brackets) s []]
     (if (empty? b)
       nil
-      (let [f (first b)]
+      (let [f (first b) r (rest b)]
         (case f
-          \( (recur (rest b) (conj s f))
-          \[ (recur (rest b) (conj s f))
-          \{ (recur (rest b) (conj s f))
-          \< (recur (rest b) (conj s f))
-          \) (if (= (last s) \() (recur (rest b) (pop s)) \))
-          \] (if (= (last s) \[) (recur (rest b) (pop s)) \])
-          \} (if (= (last s) \{) (recur (rest b) (pop s)) \})
-          \> (if (= (last s) \<) (recur (rest b) (pop s)) \>)
-          )))))
+          \( (recur r (conj s f))
+          \[ (recur r (conj s f))
+          \{ (recur r (conj s f))
+          \< (recur r (conj s f))
+          \) (if (= (last s) \() (recur r (pop s)) \))
+          \] (if (= (last s) \[) (recur r (pop s)) \])
+          \} (if (= (last s) \{) (recur r (pop s)) \})
+          \> (if (= (last s) \<) (recur r (pop s)) \>))))))
+
+(assert (= \] (get-first-invalid-bracket "(]")))
+(assert (= \] (get-first-invalid-bracket "()]")))
+(assert (= \} (get-first-invalid-bracket "{([(<{}[<>[]}>{[]{[(<()>")))
+(assert (= \) (get-first-invalid-bracket "[[<[([]))<([[{}[[()]]]")))
+(assert (= \] (get-first-invalid-bracket "[{[{({}]{}}([{[{{{}}([]")))
+(assert (= \) (get-first-invalid-bracket "[<(<(<(<{}))><([]([]()")))
+(assert (= \> (get-first-invalid-bracket "<{([([[(<>()){}]>(<<{{")))
+
+(defn inverse-bracket [b]   (case b
+                              \( \)
+                              \[ \]
+                              \{ \}
+                              \< \>))
 
 
-(assert (= \] (check-brackets "(]")))
-(assert (= \] (check-brackets "()]")))
-(assert (= \} (check-brackets "{([(<{}[<>[]}>{[]{[(<()>")))
-(assert (= \) (check-brackets "[[<[([]))<([[{}[[()]]]")))
-(assert (= \] (check-brackets "[{[{({}]{}}([{[{{{}}([]")))
-(assert (= \) (check-brackets "[<(<(<(<{}))><([]([]()")))
-(assert (= \> (check-brackets "<{([([[(<>()){}]>(<<{{")))
+(defn get-ending-brackets [brackets]
+  (loop [b (vec brackets) s []]
+    (if (empty? b)
+      (if (empty? s) nil (reverse (map inverse-bracket s)))
+      (let [f (first b) r (rest b) result []]
+        (case f
+          \( (recur r (conj s f))
+          \[ (recur r (conj s f))
+          \{ (recur r (conj s f))
+          \< (recur r (conj s f))
+          \) (if (= (last s) \() (recur r (pop s)) nil)
+          \] (if (= (last s) \[) (recur r (pop s)) nil)
+          \} (if (= (last s) \{) (recur r (pop s)) nil)
+          \> (if (= (last s) \<) (recur r (pop s)) nil)
+          f)))))
 
+
+(assert (= [\} \} \] \] \) \} \) \]] (get-ending-brackets "[({(<(())[]>[[{[]{<()<>>")))
+
+(defn calc-scores [brackes]
+  (reduce (fn [a k] (+ (* a 5)
+                       (case k
+                         \) 1
+                         \] 2
+                         \} 3
+                         \> 4
+                         0))) 0 brackes))
+
+(assert (= 288957 (calc-scores (vec "}}]])})]"))))
 
 
 (defn part1 [input]
   (->> input
-       (map check-brackets)
+       (map get-first-invalid-bracket)
        (frequencies)
-       (map (fn [[c n]] 
+       (map (fn [[c n]]
               (case c
                 \) (* 3 n)
                 \] (* 57 n)
@@ -56,8 +90,17 @@
 
 
 (defn part2 [input]
-  (->> input
-       ))
+  (let [scores (->> input
+                    (map get-ending-brackets)
+                    (map calc-scores)
+                    (sort)
+                    (filterv #(not= 0 %)))
+        _ (println scores)
+        half-count (int (/ (count scores) 2))
+        _ (println half-count)
+        ] 
+    (get scores half-count)))
 
-(assert (= 1 (part2 input-from-file-test)))
-(assert (= 1 (part2 input-from-file)))
+
+(assert (= 288957 (part2 input-from-file-test)))
+(assert (= 2412013412 (part2 input-from-file)))
