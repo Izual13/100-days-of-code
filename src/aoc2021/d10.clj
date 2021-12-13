@@ -45,7 +45,7 @@
   (loop [b (vec brackets) s []]
     (if (empty? b)
       (if (empty? s) nil (reverse (map inverse-bracket s)))
-      (let [f (first b) r (rest b) result []]
+      (let [f (first b) r (rest b)]
         (case f
           \( (recur r (conj s f))
           \[ (recur r (conj s f))
