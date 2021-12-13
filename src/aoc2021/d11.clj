@@ -58,7 +58,7 @@
         (let [f (first points)
               neighbours (get-neighbours result f)
               new-result (update-in result f inc)
-              new-result (loop [n neighbours r new-result] 
+              new-result (loop [n neighbours r new-result]
                            (if (empty? n) r (recur (rest n) (update-in r (first n) inc))))
               new-points (rest points)]
           (recur new-result new-points)))))
@@ -84,8 +84,15 @@
 (assert (= 1620 (part1 input-from-file)))
 
 
-(defn part2 [input] 0)
+(defn part2 [input]
+  (loop [i 0 m input r 0]
+    (let [new-m (inc-energy-level m)
+          new-m (next-step new-m)
+          [new-m score] (cleanup new-m)
+          new-r (+ r score)]
+      (if (= score 100) (inc i)
+          (recur (inc i) new-m new-r)))))
 
 
-(assert (= 288957 (part2 input-from-file-test)))
-(assert (= 2412013412 (part2 input-from-file)))
+(assert (= 195 (part2 input-from-file-test)))
+(assert (= 371 (part2 input-from-file)))
