@@ -55,13 +55,10 @@
                        (if (some #(= % (first p)) r)
                          (recur (rest p) r)
                          (let [c (first p)
-                               ;_ (println "points:" p "visited:" r)
-                               v (inc (get-in input c))
                                new-points (filter (fn [p] (and (not= 9 (get-in input p 9)) (not (some #(= % p) r)))) (get-neighbour-points c))]
                            (if (empty? new-points)
                              (recur (rest p) (conj r c))
                              (recur (apply conj (rest p) new-points) (conj r c)))))))]
-    ;;(println neighbours)
     (count neighbours)))
 
 (assert (= 3 (count-neighbours input-from-file-test [0 1])))
