@@ -1,3 +1,0 @@
-{:bind       "::"
- :port 5000
- :middleware [cider.nrepl/cider-middleware]}

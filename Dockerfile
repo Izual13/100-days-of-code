@@ -11,7 +11,6 @@ RUN yum install -y \
 
 EXPOSE 5000
 
-COPY ./.nrepl.edn ./.nrepl.edn
 COPY ./deps.edn ./deps.edn
 
 CMD clj -A:repl
