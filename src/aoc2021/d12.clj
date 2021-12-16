@@ -42,9 +42,16 @@
     (if (= l "end")
       []
       (let [result (get graph l)
-            visited (set (map first (filter (fn [[p c]] (or (= p "start") (= p "end") (and (Character/isLowerCase (first p)) (= c 2)))) (frequencies path))))
+            f (frequencies path)
+            isSingle (empty? (filter (fn [[p c]] (and (Character/isLowerCase (first p)) (= c 2))) f))
+            visited (set (filter (fn [p] (or (= p "start") (and (Character/isLowerCase (first p)) (not isSingle)))) path))
             result (filter #(not (contains? visited %)) result)] result))))
 
+
+(assert (false? (empty? (filter (fn [[p c]] (and (Character/isLowerCase (first p)) (= c 2))) (frequencies ["start","A","b","A","b","A","c","A","end"])))))
+(assert (true? (empty? (filter (fn [[p c]] (and (Character/isLowerCase (first p)) (= c 2))) (frequencies ["start","A","b","A","A","c","A","end"])))))
+
+(filter (fn [[p c]] (or (= p "start") (= p "end") (and (Character/isLowerCase (first p)) true))) (frequencies ["start","A", "b","b","A","A","c","A","end"]))
 
 (defn get-new-paths [path nodes]
   (vec (for [n nodes] (conj path n))))
@@ -71,6 +78,7 @@
 (defn part2 [input]
   (let [graph (build-graph input)
         paths (loop [v #{["start"]} r #{}]
+                (println (count r))
                 (if (empty? v)
                   r
                   (let [l (first v)
@@ -78,10 +86,10 @@
                     (if (empty? nodes)
                       (recur (set (rest v)) (set (conj r l)))
                       (recur (set (apply conj (rest v) (get-new-paths l nodes))) r)))))]
-    (println (filter #(= "end" (last %)) paths))
+    ;(println (filter #(= "end" (last %)) paths))
     (count (filter #(= "end" (last %)) paths))))
 
-(assert (= 195 (part2 input-from-file-test)))
+(assert (= 36 (part2 input-from-file-test)))
 (assert (= 371 (part2 input-from-file)))
 
 
