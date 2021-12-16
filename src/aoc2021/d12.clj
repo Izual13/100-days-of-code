@@ -28,7 +28,6 @@
 
 (defn get-nodes [graph path]
   (let [l (last path)]
-    ;(println "l: " l)
     (if (= l "end")
       []
       (let [result (get graph l)
@@ -54,7 +53,7 @@
 (filter (fn [[p c]] (or (= p "start") (= p "end") (and (Character/isLowerCase (first p)) true))) (frequencies ["start","A", "b","b","A","A","c","A","end"]))
 
 (defn get-new-paths [path nodes]
-  (vec (for [n nodes] (conj path n))))
+  (for [n nodes] (conj path n)))
 
 (assert (= [["aa" 1] ["aa" 2] ["aa" 3]] (get-new-paths ["aa"] [1 2 3])))
 
@@ -68,7 +67,6 @@
                     (if (empty? nodes)
                       (recur (set (rest v)) (set (conj r l)))
                       (recur (set (apply conj (rest v) (get-new-paths l nodes))) r)))))]
-    (println (filter #(= "end" (last %)) paths))
     (count (filter #(= "end" (last %)) paths))))
 
 (assert (= 10 (part1 input-from-file-test)))
@@ -76,16 +74,18 @@
 
 
 (defn part2 [input]
-  (let [graph (build-graph input)
-        paths (loop [v #{["start"]} r #{}]
-                (if (empty? v)
-                  r
-                  (let [l (first v)
-                        nodes (get-nodes2 graph l)]
-                    (if (empty? nodes)
-                      (recur (disj v l) (conj r l))
-                      (recur (apply conj (disj v l) (get-new-paths l nodes)) r)))))]
-    (count (filter #(= "end" (last %)) paths))))
+  (let [graph (build-graph input)]
+    (loop [v #{["start"]} r 0]
+      (if (empty? v)
+        r
+        (let [l (first v)
+              nodes (get-nodes2 graph l)
+              ]
+          (if (empty? nodes)
+            (if (= "end" (last l))
+              (recur (disj v l) (inc r))
+              (recur (disj v l) r))
+            (recur (apply conj (disj v l) (get-new-paths l nodes)) r)))))))
 
 (assert (= 36 (time (part2 input-from-file-test))))
 (assert (= 137948 (time (part2 input-from-file))))
