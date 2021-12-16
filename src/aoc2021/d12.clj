@@ -78,18 +78,16 @@
 (defn part2 [input]
   (let [graph (build-graph input)
         paths (loop [v #{["start"]} r #{}]
-                (println (count r))
                 (if (empty? v)
                   r
                   (let [l (first v)
                         nodes (get-nodes2 graph l)]
                     (if (empty? nodes)
-                      (recur (set (rest v)) (set (conj r l)))
-                      (recur (set (apply conj (rest v) (get-new-paths l nodes))) r)))))]
-    ;(println (filter #(= "end" (last %)) paths))
+                      (recur (disj v l) (conj r l))
+                      (recur (apply conj (disj v l) (get-new-paths l nodes)) r)))))]
     (count (filter #(= "end" (last %)) paths))))
 
-(assert (= 36 (part2 input-from-file-test)))
-(assert (= 371 (part2 input-from-file)))
+(assert (= 36 (time (part2 input-from-file-test))))
+(assert (= 137948 (time (part2 input-from-file))))
 
 
