@@ -50,8 +50,6 @@
 (assert (false? (empty? (filter (fn [[p c]] (and (Character/isLowerCase (first p)) (= c 2))) (frequencies ["start","A","b","A","b","A","c","A","end"])))))
 (assert (true? (empty? (filter (fn [[p c]] (and (Character/isLowerCase (first p)) (= c 2))) (frequencies ["start","A","b","A","A","c","A","end"])))))
 
-(filter (fn [[p c]] (or (= p "start") (= p "end") (and (Character/isLowerCase (first p)) true))) (frequencies ["start","A", "b","b","A","A","c","A","end"]))
-
 (defn get-new-paths [path nodes]
   (for [n nodes] (conj path n)))
 
