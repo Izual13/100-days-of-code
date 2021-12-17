@@ -4,7 +4,7 @@
 
 
 (def input-from-file-test
-  (let [[paper insrruction] (str/split (slurp "resources/aoc2021/day13_t") #"\r\n\r\n")
+  (let [[paper insrruction] (str/split (slurp "resources/aoc2021/day13_t") #"\r?\n\r?\n")
         parsed-paper (->> paper
                           (str/split-lines)
                           (mapv #(str/split % #","))
@@ -19,7 +19,7 @@
 
 
 (def input-from-file
-  (let [[paper insrruction] (str/split (slurp "resources/aoc2021/day13_1") #"\r\n\r\n")
+  (let [[paper insrruction] (str/split (slurp "resources/aoc2021/day13_1") #"\r?\n\r?\n")
         parsed-paper (->> paper
                           (str/split-lines)
                           (mapv #(str/split % #","))
@@ -57,8 +57,6 @@
                          r
                          (recur (rest s) (assoc-in r [(- (* 2 p) (ffirst s)) (second (first s))] true))))] {:x (:x m) :y p :matrix new-matrix})
     (let [matrix (:matrix m)
-          _ (println (type (:y m)) (type (:x m)) (type p))
-
           sharps (for [y (range 0 (:y m))
                        x (range p (:x m))
                        :when (get-in matrix [y x])]
@@ -66,7 +64,7 @@
           new-matrix (loop [s sharps r matrix]
                        (if (empty? s)
                          r
-                         (recur (rest s) (assoc-in r [(ffirst s) (- (* 2 p) (second (first s)))] true))))] {:x p :y (:x m) :matrix new-matrix})))
+                         (recur (rest s) (assoc-in r [(ffirst s) (- (* 2 p) (second (first s)))] true))))] {:x p :y (:y m) :matrix new-matrix})))
 
 (defn part1 [input]
   (let [matrix (build-matrix (:points input))
@@ -82,12 +80,13 @@
 
 (defn part2 [input]
   (let [matrix (build-matrix (:points input))
-        new-matrix (fold-matrix matrix (first (:insrructions input)))]
+        new-matrix (reduce #(fold-matrix %1 %2) matrix (:insrructions input))]
+    (println (map println (for [y (range (:y new-matrix))] (apply str (for [x (range (:x new-matrix))] (if (get-in (:matrix new-matrix) [y x]) "#" "."))))))
     (count (for [y (range 0 (:y new-matrix))
                  x (range 0 (:x new-matrix))
                  :when (get-in (:matrix new-matrix) [y x])] true))))
 
-(assert (= 36 (time (part2 input-from-file-test))))
-(assert (= 137948 (time (part2 input-from-file))))
+(assert (= 16 (time (part2 input-from-file-test))))
+(assert (= 93 (time (part2 input-from-file))))
 
 
