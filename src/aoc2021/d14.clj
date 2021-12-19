@@ -2,7 +2,6 @@
   (:require [clojure.string :as str]))
 
 
-
 (def input-from-file-test
   (let [[polymer pairs] (str/split (slurp "resources/aoc2021/day14_t") #"\r?\n\r?\n")
         parsed-pairs (->> pairs
@@ -34,7 +33,6 @@
 
 
 (defn step [m i] 
-  ;;(println "step!!!")
   (loop [pairs (filter (fn [[_ v]] (> v 0)) m) r m]
     (if (empty? pairs) r
         (let [[k c] (first pairs)
@@ -42,15 +40,11 @@
               new-r (update r k (fn [x] (- x c)))
               new-r (reduce #(update %1 %2 (fnil (fn [x] (+ c x)) 0) ) new-r new-values)
               ]
-          ;;(println "k" k "new-r" new-r)
-              
           (recur (rest pairs) new-r)))))
 
 (defn part1 [input]
   (let [first-char (first (:polymer input))
         last-char (last (:polymer input))
-        _ (println "first-char" first-char "last-char" last-char)
-        _ (println input)
         m (build-map (:polymer input))
         new-m (loop [i 0 r m] 
                 (if (= i 10) r 
@@ -61,32 +55,34 @@
                  (flatten)
                  (reduce #(assoc %1 (key (first %2)) (+ (val (first %2)) (get %1 (key (first %2)) 0))) {}))
         
-        _ (println "char-kv" char-kv)
-
         char-kv (-> char-kv
                     (update first-char inc)
                     (update last-char inc))
-        
-        ;; char-kv (reduce #(update %1 ) {} char-kv)
-        _ (println "char-kv" char-kv)
-        _ (println "sum char-kv" (apply + (map val char-kv)))
+
         ] (- (/ (apply max (map val char-kv)) 2) (/ (apply min (map val char-kv)) 2))))
 
-
-
-(frequencies "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB")
 
 
 (assert (= 1588 (part1 input-from-file-test)))
 (assert (= 2223 (part1 input-from-file)))
 
-(apply + (map val {"C" 22, "H" 14, "B" 38, "N" 18}))
-
 (defn part2 [input]
-  (let []))
+  (let [first-char (first (:polymer input))
+        last-char (last (:polymer input))
+        m (build-map (:polymer input))
+        new-m (loop [i 0 r m]
+                (if (= i 40) r
+                    (recur (inc i) (step r (:pairs input)))))
 
-(assert (= 16 (time (part2 input-from-file-test))))
-(assert (= 93 (time (part2 input-from-file))))
+        char-kv (->> new-m
+                     (map (fn [[k v]] [{(first k) v} {(second k) v}]))
+                     (flatten)
+                     (reduce #(assoc %1 (key (first %2)) (+ (val (first %2)) (get %1 (key (first %2)) 0))) {}))
 
-(- 5644 1790)
-(/ 3854 2)
+        char-kv (-> char-kv
+                    (update first-char inc)
+                    (update last-char inc))] (- (/ (apply max (map val char-kv)) 2) (/ (apply min (map val char-kv)) 2))))
+
+(assert (= 2188189693529 (time (part2 input-from-file-test))))
+(assert (= 2566282754493 (time (part2 input-from-file))))
+
