@@ -69,17 +69,44 @@ input-from-file-test
                          result' (update-risks input result cursor neighbours)
                          heap' (apply conj heap neighbours)
                          heap' (disj heap' cursor)
-                         cursor' (min-by #(get-in result' %) heap')
-                         ]
+                         cursor' (min-by #(get-in result' %) heap')]
                      (recur cursor' heap' (conj visited cursor) result'))))] result))
 
 
 (assert (= 40 (part1 input-from-file-test)))
 (assert (= 487 (time (part1 input-from-file))))
 
-(defn part2 [input]
-  (let [] 0))
+(defn input-x5 [input]
+  (let [y-count (count input)
+        x-count (count (first input))
+        next-value (fn [v y x] (let [m (+ (int (/ y y-count)) (int (/ x x-count)))
+                                     r (+ v m)]
+                                 (if (< r 10) r (mod r 9))))
+        ]
+    (vec (for [y (range (* 5 y-count))]
+           (vec (for [x (range (* 5 x-count))] (next-value (get-in input [(mod y y-count) (mod x x-count)]) y x)))))))
 
-(assert (= 2188189693529 (time (part2 input-from-file-test))))
-(assert (= 2566282754493 (time (part2 input-from-file))))
+
+(defn part2 [original-input]
+  (let [input (input-x5 original-input)
+        y-count (count input)
+        x-count (count (first input))
+        maxx (dec x-count)
+        maxy (dec y-count)
+        target [maxy maxx]
+        counts (-> (build-empty-map y-count x-count)
+                   (assoc-in [0 0] 0))
+        result (loop [cursor [0 0] heap #{[0 0]} visited #{} result counts]
+                 (if (or (= cursor target) (empty? heap))
+                   (get-in result target)
+                   (let [neighbours (->> (get-neighbours result cursor)
+                                         (filter #(not (contains? visited %))))
+                         result' (update-risks input result cursor neighbours)
+                         heap' (apply conj heap neighbours)
+                         heap' (disj heap' cursor)
+                         cursor' (min-by #(get-in result' %) heap')]
+                     (recur cursor' heap' (conj visited cursor) result'))))] result))
+
+(assert (= 315 (time (part2 input-from-file-test))))
+(assert (= 2821 (time (part2 input-from-file))))
 
