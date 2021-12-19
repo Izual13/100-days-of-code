@@ -36,7 +36,22 @@ input-from-file-test
     (loop [n neighbours r risks]
       (if (empty? n)
         r
-        (recur (rest n) (update-in r (first n) (fn [x] (min x (+ (get-in input (first n)) c)))))))))
+        (let [f (first n)
+              old-value (get-in r f)
+              new-value (+ (get-in input f) c)]
+          (if (< new-value old-value)
+            (recur (rest n) (assoc-in r f new-value))
+            (recur (rest n) r)))))))
+
+(defn min-by [fn coll]
+  (->> (reduce #(let [n (fn %2)]
+                  (cond (nil? %1) [n %2]
+                        (> (first %1) n) [n %2]
+                        :else %1)) nil coll)
+       (second)))
+
+
+(assert (= 1 (min-by #(inc %) #{5 1 2 3 4})))
 
 (defn part1 [input]
   (let [y-count (count input)
@@ -54,10 +69,9 @@ input-from-file-test
                          result' (update-risks input result cursor neighbours)
                          heap' (apply conj heap neighbours)
                          heap' (disj heap' cursor)
-                         cursor' (first (sort-by #(get-in result' %) heap'))]
+                         cursor' (min-by #(get-in result' %) heap')
+                         ]
                      (recur cursor' heap' (conj visited cursor) result'))))] result))
-
-
 
 
 (assert (= 40 (part1 input-from-file-test)))
