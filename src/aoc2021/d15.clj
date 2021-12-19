@@ -49,27 +49,19 @@ input-from-file-test
         result (loop [cursor [0 0] heap #{[0 0]} visited #{} result counts]
                  (if (or (= cursor target) (empty? heap))
                    (get-in result target)
-                   ;;result
-                   (if (contains? visited cursor)
-                     ;;remove visited cursor
-                     (let [cursor' (first (sort-by #(get-in result %) heap))
-                           heap' (disj heap cursor')]
-                       (recur cursor' heap' visited result))
-
-                     ;;main loop
-                     (let [neighbours (get-neighbours result cursor)
-                           result' (update-risks input result cursor neighbours)
-                           heap' (apply conj heap neighbours)
-                           heap' (disj heap' cursor)
-                           cursor' (first (sort-by #(get-in result' %) heap'))
-                           ]
-                       (recur cursor' heap' (conj visited cursor) result')))))] result))
+                   (let [neighbours (->> (get-neighbours result cursor)
+                                         (filter #(not (contains? visited %))))
+                         result' (update-risks input result cursor neighbours)
+                         heap' (apply conj heap neighbours)
+                         heap' (disj heap' cursor)
+                         cursor' (first (sort-by #(get-in result' %) heap'))]
+                     (recur cursor' heap' (conj visited cursor) result'))))] result))
 
 
 
 
 (assert (= 40 (part1 input-from-file-test)))
-(assert (= 2223 (part1 input-from-file)))
+(assert (= 487 (time (part1 input-from-file))))
 
 (defn part2 [input]
   (let [] 0))
