@@ -118,9 +118,9 @@
     2 (apply min (map calculate (:children t)))
     3 (apply max (map calculate (:children t)))
     4 (:value t)
-    5 (let [c (:children t)] (if (> (calculate (first c)) (calculate (second c))) 1 0))
-    6 (let [c (:children t)] (if (< (calculate (first c)) (calculate (second c))) 1 0))
-    7 (let [c (:children t)] (if (= (calculate (first c)) (calculate (second c))) 1 0))))
+    5 (let [[f s] (:children t)] (if (> (calculate f) (calculate s)) 1 0))
+    6 (let [[f s] (:children t)] (if (< (calculate f) (calculate s)) 1 0))
+    7 (let [[f s] (:children t)] (if (= (calculate f) (calculate s)) 1 0))))
 
 
 (defn part2 [input]
