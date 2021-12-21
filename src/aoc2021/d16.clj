@@ -123,12 +123,6 @@
     7 (let [c (:children t)] (if (= (calculate (first c)) (calculate (second c))) 1 0))))
 
 
-
-(defn part2 [input]
-  (let [packet (parse-packet (apply str (map toBin input)))]
-    (calculate packet)))
-
-
 (defn part2 [input]
   (->> input 
        (map toBin)
