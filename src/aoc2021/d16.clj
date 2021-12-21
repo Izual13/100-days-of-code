@@ -58,6 +58,7 @@
 (assert (= 2021  (:value (parse-literal "101111111000101000"))))
 (assert (= "10111" (subs "101111111000101000" 0 5)))
 
+(declare parse-packet)
 
 (defn parse-operator [[i & xs]]
   (case i
@@ -66,15 +67,15 @@
              p (loop [o (take l (drop 15 xs)) r []]
                  (if (empty?  o)
                    r
-                   (let [subp (parse-packet o)]
-                     (recur (:tail subp) (conj r subp)))))]
+                   (let [child (parse-packet o)]
+                     (recur (:tail child) (conj r child)))))]
          {:children p :tail (drop (+ l 15) xs)})
     \1 (let [l (toInt (apply str (take 11 xs)))
              p (loop [o (drop 11 xs) r [] i 0]
                  (if (=  i l)
                    r
-                   (let [subp (parse-packet o)]
-                     (recur (:tail subp) (conj r subp) (inc i)))))]
+                   (let [child (parse-packet o)]
+                     (recur (:tail child) (conj r child) (inc i)))))]
          {:children p :tail (:tail (last p))})
     :else (println "cannot parse i" i)))
 
