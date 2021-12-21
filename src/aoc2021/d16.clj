@@ -45,11 +45,14 @@
 (assert (= 6 (toInt "1" "1" "0")))
 (assert (= 6 (toInt "110")))
 
-
 (defn parse-literal [[marker & xs]]
   (loop [m marker o xs r []]
     (if (= m \0)
-      (let [_ (comment println (apply str (apply conj r (take 4 o))))] {:value (toInt (apply str (apply conj r (take 4 o)))) :tail (drop 4 o)})
+      {:value (->> o
+                   (take 4)
+                   (apply conj r)
+                   (apply str)
+                   (toInt)) :tail (drop 4 o)}
       (let [f4 (take 4 o)
             new-m (first (drop 4 o))
             new-o (drop 5 o)]
