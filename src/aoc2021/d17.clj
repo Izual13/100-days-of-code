@@ -24,7 +24,7 @@
 
 (defn fire [[vx vy] [tx1 tx2 ty1 ty2]] (loop [x 0 y 0 vx vx vy vy max-y 0 r false]
                                          (if (or (> x tx2) (< y ty1))
-                                           [max-y r]
+                                           [r max-y]
                                            (let [new-x (+ x vx)
                                                  new-y (+ y vy)
                                                  new-vx (cond
@@ -33,7 +33,6 @@
                                                           :else 0)
                                                  new-vy (dec vy)
                                                  new-r (if (and (>= tx2 x tx1) (>= ty2 y ty1)) true r)]
-                                             ;;(println [x y])
                                              (recur new-x new-y new-vx new-vy (max max-y y) new-r)))))
 
 
@@ -41,10 +40,10 @@
 
 
 (defn part1 [input]
-  (->> (for [x (range 1000)
-             y (range 1000)] (fire [x y] input))
-       (filter (fn [[_ r]] r))
-       (map first)
+  (->> (for [x (range 100)
+             y (range 100)] (fire [x y] input))
+       (filter (fn [[r _]] r))
+       (map second)
        (apply max)))
 
 (assert (= 45 (time (part1 input-from-file-test))))
@@ -52,11 +51,13 @@
 
 
 
-(defn part2 [input])
+(defn part2 [input]
+  (->> (for [x (range -500 500)
+             y (range -500 500)
+             :let [[r _] (fire [x y] input)]
+             :when r] [x y])
+       (count)))
 
 
-(assert (= 2021 (time (part2 input-from-file-test))))
-(assert (= 1673210814091 (time (part2 input-from-file))))
-
-
-(>= 6 5 4 3 2 1 0)
+(assert (= 112 (time (part2 input-from-file-test))))
+(assert (= 1117 (time (part2 input-from-file))))
