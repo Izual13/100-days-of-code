@@ -58,6 +58,21 @@
              :when r] [x y])
        (count)))
 
+(defn part2-parallel [input]
+  (->> (for [x (range -500 500)
+             y (range -500 500)] [x y])
+       (pmap #(fire % input))
+       (filter (fn [[r _]] r))
+       (count)))
+
+(defn part2-parallel [input]
+  (let [points (for [x (range -500 500)
+                     y (range -500 500)] [x y])
+        results (time (doall (pmap #(fire % input) points)))]
+    (count (filter (fn [[r _]] r) results))))
+
+
 
 (assert (= 112 (time (part2 input-from-file-test))))
 (assert (= 1117 (time (part2 input-from-file))))
+(assert (= 1117 (time (part2-parallel input-from-file))))
