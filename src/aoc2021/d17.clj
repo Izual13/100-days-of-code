@@ -24,7 +24,7 @@
 
 (defn fire [[vx vy] [tx1 tx2 ty1 ty2]] (loop [x 0 y 0 vx vx vy vy max-y 0 r false]
                                          (if (or (> x tx2) (< y ty1))
-                                           [r max-y]
+                                           (if r max-y nil)
                                            (let [new-x (+ x vx)
                                                  new-y (+ y vy)
                                                  new-vx (cond
@@ -36,14 +36,13 @@
                                              (recur new-x new-y new-vx new-vy (max max-y y) new-r)))))
 
 
-(fire [7 2] input-from-file-test)
-
+(assert (= 3 (fire [7 2] input-from-file-test)))
+(assert (nil? (fire [70 20] input-from-file-test)))
 
 (defn part1 [input]
   (->> (for [x (range 100)
              y (range 100)] (fire [x y] input))
-       (filter (fn [[r _]] r))
-       (map second)
+       (filter some?)
        (apply max)))
 
 (assert (= 45 (time (part1 input-from-file-test))))
@@ -54,23 +53,14 @@
 (defn part2 [input]
   (->> (for [x (range -500 500)
              y (range -500 500)
-             :let [[r _] (fire [x y] input)]
-             :when r] [x y])
-       (count)))
-
-(defn part2-parallel [input]
-  (->> (for [x (range -500 500)
-             y (range -500 500)] [x y])
-       (pmap #(fire % input))
-       (filter (fn [[r _]] r))
+             :when (not (nil? (fire [x y] input)))] [x y])
        (count)))
 
 (defn part2-parallel [input]
   (let [points (for [x (range -500 500)
                      y (range -500 500)] [x y])
-        results (time (doall (pmap #(fire % input) points)))]
-    (count (filter (fn [[r _]] r) results))))
-
+        results (doall (pmap #(fire % input) points))]
+    (count (filter #(not (nil? %)) results))))
 
 
 (assert (= 112 (time (part2 input-from-file-test))))
