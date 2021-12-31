@@ -63,6 +63,19 @@
     (count (filter #(not (nil? %)) results))))
 
 
+(defn chunked-pmap [f partition-size coll]
+  (->> coll
+       (partition-all partition-size)
+       (pmap (comp doall (partial map f)))
+       (apply concat)))
+
+(defn part2-parallel-with-chanks [input]
+  (let [points (for [x (range -500 500)
+                     y (range -500 500)] [x y])
+        results (chunked-pmap #(fire % input) 5000 points)]
+    (count (filter #(not (nil? %)) results))))
+
 (assert (= 112 (time (part2 input-from-file-test))))
 (assert (= 1117 (time (part2 input-from-file))))
 (assert (= 1117 (time (part2-parallel input-from-file))))
+(assert (= 1117 (time (part2-parallel-with-chanks input-from-file))))
