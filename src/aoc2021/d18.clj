@@ -5,13 +5,21 @@
 (def input-from-file-test
   (->> (slurp "resources/aoc2021/day18_t")
        (str/split-lines)
-       (map read-string)))
+       (map read-string)
+       (vec)))
+
+(def input-from-file-test2
+  (->> (slurp "resources/aoc2021/day18_t2")
+       (str/split-lines)
+       (map read-string)
+       (vec)))
 
 
 (def input-from-file
   (->> (slurp "resources/aoc2021/day18_1")
        (str/split-lines)
-       (map read-string)))
+       (map read-string)
+       (vec)))
 
 (assert (= [[3,8],7] (read-string "[[3,8],7]")))
 
@@ -40,7 +48,6 @@
      (if (nil? r)
        nil
        (loop [r r]
-         ;;(println "r" r "v" (get-in snails r))
          (if (vector? (get-in snails r))
            (recur (conj r 0))
            r))))))
@@ -56,7 +63,6 @@
      (if (nil? r)
        nil
        (loop [r r]
-         ;;(println "r" r "v" (get-in snails r))
          (if (vector? (get-in snails r))
            (recur (conj r 1))
            r))))))
@@ -76,30 +82,18 @@
 
 
 (defn explode-snails [snails path]
-  ;; (println "update-snails")
   (let [r-path (pop path)
-        ;; ppath (peek path)
         c (get-in snails r-path)
-        ;; _ (println "old array" c)
-        ;; _ (println "ppath" ppath)
         new-snails (assoc-in snails r-path -1)
-        ;; _ (println "path to null" r-path)
-        ;; _ (println "old-snails" snails)
-        ;; _ (println "new-snails" new-snails)
         l (prev-i new-snails r-path)
         r (next-i new-snails r-path)
-        ;; _ (println "p" l "n" r (get-in snails r))
         new-snails (assoc-in snails r-path 0)
         new-snails (if (nil? l) new-snails (assoc-in new-snails l (+ (left c) (get-in new-snails l))))
         new-snails (if (nil? r) new-snails (assoc-in new-snails r (+ (right c) (get-in new-snails r))))
-        ;; _ (println "new-snails" new-snails)
         ]
-    ;; (-> snails
-    ;;     (assoc-in l (+ (left c) (get-in snails l 0))))
     new-snails))
 
 (defn split-snails [snails]
-  ;;(println "split-snails" snails)
   (loop [s (first-i snails) r snails changed false]
     (if (nil? s) [r changed]
         (let [v (get-in r s)
@@ -115,8 +109,6 @@
 (assert (= [[[[0 7] 4] [[7 8] [0 [6 7]]]] [1 1]] (left (split-snails [[[[0 7] 4] [[7 8] [0 13]]] [1 1]]))))
 
 (defn normalization [snails]
-  (println (left snails))
-  (println "+" (right snails) "\n\n")
   (loop [stack (first-i snails) result snails]
     (if (nil? stack)
       (let [[new-result changed] (split-snails result)]
@@ -167,8 +159,11 @@
 
 
 (defn part2 [input]
-  (->> input))
+  (apply max (for [i (range (count input))
+                   j (range (count input))
+                   :when (not= i j)]
+               (->> (normalization [(get input i) (get input j)])
+                    (calc)))))
 
-(assert (= 112 (time (part2 input-from-file-test))))
-(assert (= 1117 (time (part2 input-from-file))))
-
+(assert (= 3993 (time (part2 input-from-file-test2))))
+(assert (= 4747 (time (part2 input-from-file))))
