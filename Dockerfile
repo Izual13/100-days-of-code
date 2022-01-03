@@ -14,6 +14,6 @@ EXPOSE 5000
 COPY ./resources/ ./resources/
 COPY ./deps.edn ./deps.edn
 
-CMD clj -A:repl
+CMD clj -M:repl
 
 

@@ -1,5 +1,6 @@
 (ns  aoc2021.d18
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clj-async-profiler.core :as prof]))
 
 
 (def input-from-file-test
@@ -161,3 +162,12 @@
 
 (assert (= 3993 (time (part2 input-from-file-test2))))
 (assert (= 4747 (time (part2 input-from-file))))
+
+
+
+(do
+  (println "start profiling")
+  (prof/start)
+  (part2 input-from-file)
+  (println (prof/stop))
+  (println "end profiling"))

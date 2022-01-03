@@ -1,5 +1,6 @@
 (ns  aoc2021.d17
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clj-async-profiler.core :as prof]))
 
 (defn parse-coordinates [s]
   (let [[_ x1 x2 y1 y2] (re-matches #"target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)" s)]
@@ -32,7 +33,7 @@
                                                           (< vx 0) (inc vx)
                                                           :else 0)
                                                  new-vy (dec vy)
-                                                 new-r (if (and (>= tx2 x tx1) (>= ty2 y ty1)) true r)]
+                                                 new-r (or r (and (>= tx2 x tx1) (>= ty2 y ty1)))]
                                              (recur new-x new-y new-vx new-vy (max max-y y) new-r)))))
 
 
@@ -79,3 +80,11 @@
 (assert (= 1117 (time (part2 input-from-file))))
 (assert (= 1117 (time (part2-parallel input-from-file))))
 (assert (= 1117 (time (part2-parallel-with-chanks input-from-file))))
+
+
+(do
+  (println "start profiling")
+  (prof/start)
+  (time (part2-parallel input-from-file))
+  (println (prof/stop))
+  (println "end profiling"))
