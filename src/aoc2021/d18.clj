@@ -84,23 +84,21 @@
 (defn explode-snails [snails path]
   (let [r-path (pop path)
         c (get-in snails r-path)
-        new-snails (assoc-in snails r-path -1)
+        new-snails (assoc-in snails r-path 0)
         l (prev-i new-snails r-path)
         r (next-i new-snails r-path)
-        new-snails (assoc-in snails r-path 0)
         new-snails (if (nil? l) new-snails (assoc-in new-snails l (+ (left c) (get-in new-snails l))))
-        new-snails (if (nil? r) new-snails (assoc-in new-snails r (+ (right c) (get-in new-snails r))))
-        ]
+        new-snails (if (nil? r) new-snails (assoc-in new-snails r (+ (right c) (get-in new-snails r))))]
     new-snails))
 
-(defn split-snails [snails]
-  (loop [s (first-i snails) r snails changed false]
-    (if (nil? s) [r changed]
-        (let [v (get-in r s)
-              ni (next-i r s)]
+(defn split-snails [s]
+  (loop [i (first-i s)]
+    (if (nil? i) [s false]
+        (let [v (get-in s i)
+              ni (next-i s i)]
           (if (> v 9)
-            [(assoc-in r s [(int (/ v 2)) (int (Math/ceil (/ v 2)))]) true]
-            (recur ni r changed))))))
+            [(assoc-in s i [(int (/ v 2)) (int (Math/ceil (/ v 2)))]) true]
+            (recur ni))))))
 
 
 (assert (= 2 (int (/ 5 2))))
@@ -117,7 +115,7 @@
           (recur (first-i new-result) new-result)))
       (if (> (count stack) 4)
         (let [new-result  (explode-snails result stack)]
-          (recur (first-i new-result) new-result))
+          (recur (next-i new-result (pop stack)) new-result))
         (recur (next-i result stack) result)))))
 
 
@@ -128,14 +126,10 @@
 (assert (= [[[[0,7],4],[[7,8],[6,0]]],[8,1]] (normalization [[[[[4,3],4],4],[7,[[8,4],9]]] [1,1]])))
 
 
-(defn calc [snails]
-  (+
-   (* 3 (if (vector? (left snails))
-          (calc (left snails))
-          (left snails)))
-   (* 2 (if (vector? (right snails))
-          (calc (right snails))
-          (right snails)))))
+
+(defn calc
+  ([a] (if (vector? a) (calc (left a) (right a)) a))
+  ([a b] (+ (* 3 (calc a)) (* 2 (calc b)))))
 
 (assert (= 29 (calc [9,1])))
 (assert (= 129 (calc [[9,1],[1,9]])))
