@@ -11,3 +11,8 @@
 > docker-compose up -d --build
 >
 > docker-compose down
+
+
+##### warn-on-reflection
+> (set! *warn-on-reflection* true)
+>
