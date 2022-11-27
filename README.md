@@ -1,6 +1,6 @@
 # 100-days-of-code
 
-> clj -A:repl
+> clj -M:repl
 
 ##### for windows
 > docker build -t clj .
