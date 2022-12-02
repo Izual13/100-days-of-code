@@ -8,11 +8,11 @@
 (assert (= 10 (calorie-counting "1\n2\n3\n4")))
 
 (assert (= 67633 (->> elfs
-                   (map #(calorie-counting %))
+                   (map calorie-counting)
                    (apply max))))
 
 (assert (= 199628 (->> elfs
-                    (map #(calorie-counting %))
+                    (map calorie-counting)
                     (sort)
                     (take-last 3)
                     (apply +))))
