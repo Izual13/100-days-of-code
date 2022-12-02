@@ -36,26 +36,15 @@
 
 ;;Rock (A, X) Paper(B, Y) Scissors(C, Z)
 (defn calc2 [[a b]] 
-  (let[f (cond
-           (= b "X") 0
-           (= b "Y") 3
-           :else 6)
-       
-       b (cond
-           (= f 3) a
-           (and (= f 0) (= a "A")) "C"
-           (and (= f 0) (= a "B")) "A"
-           (and (= f 0) (= a "C")) "B"
-           (and (= f 6) (= a "A")) "B"
-           (and (= f 6) (= a "B")) "C"
-           (and (= f 6) (= a "C")) "A"
-           :else b)
-       
-       l (cond
-           (= b "A") 1
-           (= b "B") 2
-           :else 3)
-       ] (+ f l)))
+  (calc [a (cond
+           (= b "Y") a
+           (and (= b "X") (= a "A")) "C"
+           (and (= b "X") (= a "B")) "A"
+           (and (= b "X") (= a "C")) "B"
+           (and (= b "Z") (= a "A")) "B"
+           (and (= b "Z") (= a "B")) "C"
+           (and (= b "Z") (= a "C")) "A"
+           :else b)]))
 
 (assert (= 12 (apply + (map calc2 test-rounds))))
 
