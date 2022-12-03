@@ -33,28 +33,23 @@
                   (map calc-weight)
                   (apply +))))
 
-(assert (= 70 (->>   
-                (loop [r test-rucksacks result []]  
-                  (if (empty? r) 
-                    result
-                    (let[_ (println (map set (take 3 r)))
-                         s (apply clojure.set/intersection (map set (take 3 r)))
-                         _ (println s)
-                         ]
-                      (recur (nthrest r 3) (apply conj result s)))))
+(defn rucksacks-intersection [r] 
+  (loop [r r result []]  
+    (if (empty? r) 
+      result
+      (let[s (apply clojure.set/intersection (map set (take 3 r)))]
+        (recur (nthrest r 3) (apply conj result s))))))
+
+(assert (= [\a] (rucksacks-intersection ["a" "ab" "ac"])))
+
+(assert (= 70 (->> test-rucksacks
+                (rucksacks-intersection)
                 (map calc-weight)
                 (apply +)
                 )))
 
-(assert (= 2413 (->>   
-                  (loop [r rucksacks result []]  
-                    (if (empty? r) 
-                      result
-                      (let[_ (println (map set (take 3 r)))
-                           s (apply clojure.set/intersection (map set (take 3 r)))
-                           _ (println s)
-                           ]
-                        (recur (nthrest r 3) (apply conj result s)))))
+(assert (= 2413 (->> rucksacks
+                  (rucksacks-intersection)
                   (map calc-weight)
                   (apply +)
                   )))
