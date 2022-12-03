@@ -45,14 +45,12 @@
 (assert (= 70 (->> test-rucksacks
                 (rucksacks-intersection)
                 (map calc-weight)
-                (apply +)
-                )))
+                (apply +))))
 
 (assert (= 2413 (->> rucksacks
                   (rucksacks-intersection)
                   (map calc-weight)
-                  (apply +)
-                  )))
+                  (apply +))))
   
   
 (assert (= #{:c :b} (apply clojure.set/intersection [#{:a :b :c} #{:d :c :b}])))
