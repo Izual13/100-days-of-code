@@ -30,9 +30,9 @@
            :else 0)
        ] (+ f l)))
 
-(assert (= 15 (apply + (map calc test-rounds))))
+(assert (= 15 (reduce + (map calc test-rounds))))
 
-(assert (= 10595 (apply + (map calc rounds))))
+(assert (= 10595 (reduce + (map calc rounds))))
 
 ;;Rock (A, X) Paper(B, Y) Scissors(C, Z)
 (defn calc2 [[a b]] 
@@ -46,6 +46,6 @@
            (and (= b "Z") (= a "C")) "A"
            :else b)]))
 
-(assert (= 12 (apply + (map calc2 test-rounds))))
+(assert (= 12 (reduce + (map calc2 test-rounds))))
 
-(assert (= 9541 (apply + (map calc2 rounds))))
+(assert (= 9541 (reduce + (map calc2 rounds))))

@@ -25,34 +25,34 @@
                  (map parse-rucksack)
                  (map find-letter)
                  (map calc-weight)
-                 (apply +))))
+                 (reduce +))))
 
 (assert (= 8394 (->> rucksacks
                   (map parse-rucksack)
                   (map find-letter)
                   (map calc-weight)
-                  (apply +))))
+                  (reduce +))))
 
 (defn rucksacks-intersection [r] 
   (loop [r r result []]  
     (if (empty? r) 
       result
-      (let[s (apply clojure.set/intersection (map set (take 3 r)))]
-        (recur (nthrest r 3) (apply conj result s))))))
+      (let[s (reduce clojure.set/intersection (map set (take 3 r)))]
+        (recur (nthrest r 3) (reduce conj result s))))))
 
 (assert (= [\a] (rucksacks-intersection ["a" "ab" "ac"])))
 
 (assert (= 70 (->> test-rucksacks
                 (rucksacks-intersection)
                 (map calc-weight)
-                (apply +))))
+                (reduce +))))
 
 (assert (= 2413 (->> rucksacks
                   (rucksacks-intersection)
                   (map calc-weight)
-                  (apply +))))
+                  (reduce +))))
   
   
-(assert (= #{:c :b} (apply clojure.set/intersection [#{:a :b :c} #{:d :c :b}])))
+(assert (= #{:c :b} (reduce clojure.set/intersection [#{:a :b :c} #{:d :c :b}])))
 
 (assert (= [4 5 6] (nthrest [1 2 3 4 5 6] 3)))
