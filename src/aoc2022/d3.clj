@@ -53,6 +53,6 @@
                   (reduce +))))
   
   
-(assert (= #{:c :b} (reduce clojure.set/intersection [#{:a :b :c} #{:d :c :b}])))
+(assert (= #{:c :b} (apply clojure.set/intersection [#{:a :b :c} #{:d :c :b}])))
 
 (assert (= [4 5 6] (nthrest [1 2 3 4 5 6] 3)))
