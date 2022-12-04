@@ -49,7 +49,7 @@
 
 (assert (= 70 (->> test-rucksacks
                 (partition 3)
-                (mapcat #(apply clojure.set/intersection (map set %)))
+                (mapcat #(reduce clojure.set/intersection (map set %)))
                 (map calc-weight)
                 (reduce +))))
 
@@ -61,7 +61,7 @@
 
 (assert (= 2413 (->> rucksacks
                 (partition 3)
-                (mapcat #(apply clojure.set/intersection (map set %)))
+                (mapcat #(reduce clojure.set/intersection (map set %)))
                 (map calc-weight)
                 (reduce +))))
   
