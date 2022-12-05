@@ -19,8 +19,9 @@
   (loop [s s r []] 
     (if (empty? s) 
       r
-      (let [f (parse-letter (subs s 0 (min 4 (count s))))]
-        (recur (subs s (min 4 (count s))) (conj r f))))))
+      (let [right (min 4 (count s))
+            f (parse-letter (subs s 0 right))]
+        (recur (subs s right) (conj r f))))))
 
 (assert (= [nil "D" nil] (parse-stack "    [D]    ")))
 (assert (= ["N" "C" nil] (parse-stack "[N] [C]    ")))
@@ -33,11 +34,13 @@
         stacks (loop [l l r (vec (for [x (range c)] []))]
                  (if (empty? l) 
                    r
-                   (let [p (parse-stack (first l))
-                         new-r (vec (map-indexed (fn [i v] (if (nil? v) (get r i) (conj (get r i) v))) p))
-                         ]
-                     (recur (rest l) new-r))))
-        ] 
+                   (recur (rest l) 
+                     (->> l
+                       first
+                       parse-stack
+                       (map-indexed #(if (nil? %2) (get r %1) (conj (get r %1) %2)))
+                       vec))))]
+    
     [stacks (map parse-moves (str/split-lines m))]))
 
 (assert (= [[["N" "Z"] ["D" "C" "M"] ["P"]] `([1 2 1] [3 1 3] [2 2 1] [1 1 2])] (parse-input test-input)))
@@ -47,30 +50,29 @@
   (loop [m moves s stacks] 
     (if (empty? m)
       s
-      (let [[c from to] (first m)
-            new-s (loop [i 0 s s] 
-                    (if (= i c) 
-                      s
-                      (let [e (first (get s (- from 1)))
-                            ]
-                        (if (nil? e)
-                          s
-                          (let [new-s (update s (- from 1) rest)
-                                new-s (update new-s (- to 1) #(cons e %))]
-                            (recur (inc i) new-s))
-                          ))))]
-        (recur (rest m) new-s)))))
+      (let [[c from to] (first m)]
+        (recur (rest m) 
+          (loop [i 0 s s] 
+            (if (= i c) 
+              s
+              (let [e (first (get s (- from 1)))]
+                (if (nil? e)
+                  s
+                  (recur (inc i) 
+                    (-> s 
+                      (update (- from 1) rest)
+                      (update  (- to 1) #(cons e %)))))))))))))
 
 (assert (= "CMZ" 
           (->> test-input
-            (parse-input)
+            parse-input
             rearrangement
             (map first)
             (apply str))))
 
 (assert (= "SBPQRSCDF" 
           (->> input
-            (parse-input)
+            parse-input
             rearrangement
             (map first)
             (apply str))))
@@ -81,24 +83,24 @@
     (if (empty? m)
       s
       (let [[c from to] (first m)
-            e (take c (get s (- from 1)))
-            new-s (update s (- from 1) #(nthrest % c))
-            new-s (update new-s (- to 1) #(reduce (fn [element array] (cons array element)) % (reverse e)))
-            ]
-        (recur (rest m) new-s)))))
+            e (take c (get s (- from 1)))]
+        (recur (rest m) 
+          (-> s
+            (update (- from 1) #(nthrest % c))
+            (update (- to 1) #(reduce (fn [element array] (cons array element)) % (reverse e)))))))))
 
 (assert (= ["D" "N" "Z" "P"] (reduce #(cons %2 %1) ["Z" "P"] (reverse ["D" "N"]))))
 
 (assert (= "MCD" 
           (->> test-input
-            (parse-input)
+            parse-input
             rearrangement-2
             (map first)
             (apply str))))
 
 (assert (= "RGLVRCQSB" 
           (->> input
-            (parse-input)
+            parse-input
             rearrangement-2
             (map first)
             (apply str)
