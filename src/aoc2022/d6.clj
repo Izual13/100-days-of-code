@@ -19,16 +19,14 @@
 
 (defn optimized-find-marker [s c] 
   (loop [b 0 max-b (count s) m {}]
-    (let [count-keys (count m)]
-      (if (= b max-b)
-        nil
-        (cond 
-          (= count-keys c) b
-          (>= b c) (recur (inc b) max-b (-> m
-                                          (mremove (get s (- b c)))
-                                          (update (get s b) (fnil inc 0))))
-          (< b c) (recur (inc b) max-b (update m (get s b) (fnil inc 0))))))))
-
+    (if (= b max-b)
+      nil
+      (cond 
+        (= (count m) c) b
+        (< b c) (recur (inc b) max-b (update m (get s b) (fnil inc 0)))
+        :else (recur (inc b) max-b (-> m
+                                     (mremove (get s (- b c)))
+                                     (update (get s b) (fnil inc 0))))))))
 
 (assert (= 7 (find-marker test-input 4)))
 (assert (= 1080 (find-marker input 4)))
@@ -36,14 +34,14 @@
 (assert (= 19 (find-marker test-input 14)))
 (assert (= 3645 (find-marker input 14)))
 
-
 (assert (= 7 (optimized-find-marker test-input 4)))
 (assert (= 1080 (optimized-find-marker input 4)))
 
 (assert (= 19 (optimized-find-marker test-input 14)))
 (assert (= 3645 (optimized-find-marker input 14)))
 
-(time (optimized-find-marker input 4))
+(time (optimized-find-marker (vec input) 4))
+(time (find-marker input 4))
 
 (do
   (vec (for [i (range 1000)] (optimized-find-marker input 4)))
