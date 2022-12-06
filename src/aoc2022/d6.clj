@@ -13,16 +13,18 @@
                   (recur (inc b))))))
 
 (defn optimized-find-marker [s c]
-  (let [max-b (count s) offset (int \a)] 
+  (let [max-b (count s) 
+        offset (int \a) 
+        s (mapv int s)] 
     (loop [b 0 m (vec (for [i (range 26)] 0))]
       (if (= b max-b)
         nil
         (cond 
-          (< b c) (recur (inc b) (update m (- (int (get s b)) offset) inc))
+          (< b c) (recur (inc b) (update m (- (get s b) offset) inc))
           (every? #(>= 1 %) m) b
           :else (recur (inc b) (-> m
-                                 (update (- (int (get s (- b c))) offset) dec)
-                                 (update (- (int (get s b)) offset) inc))))))))
+                                 (update (- (get s (- b c)) offset) dec)
+                                 (update (- (get s b) offset) inc))))))))
 
 (assert (= 7 (find-marker test-input 4)))
 (assert (= 1080 (find-marker input 4)))
@@ -36,7 +38,7 @@
 (assert (= 19 (optimized-find-marker test-input 14)))
 (assert (= 3645 (optimized-find-marker input 14)))
 
-(time (optimized-find-marker (vec input) 4))
+(time (optimized-find-marker input 4))
 (time (find-marker input 4))
 
 (do
