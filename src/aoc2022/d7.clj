@@ -41,7 +41,6 @@
           (= i "cd ..") (recur (rest c) r (pop s))
           (str/starts-with? i "cd ") (recur (rest c) r (conj s (subs i 3)))
           (= i "ls") (recur (rest c) (assoc-in r s (parse-files o)) s)
-          ;(assoc-in r (conj s (subs i 3)) {:dir true})
           :else (recur (rest c) r s))))))
 
 
