@@ -18,9 +18,7 @@
 
 (assert (= 1792 (let[m input
                      y (count m)
-                     x (count (first m))
-                     ]
-                  (println "\n\n\n\n")
+                     x (count (first m))]
                   (+ y x x y -4 (count (for [i (range 1 (dec x))
                                              j (range 1 (dec y))
                                              :let [e (get-in m [i j])]
