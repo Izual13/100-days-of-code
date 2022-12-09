@@ -5,9 +5,8 @@
 
 
 (def test-input (clojure.string/split (slurp "resources/aoc2022/day9_t") #"\n"))
+(def test-input2 (clojure.string/split (slurp "resources/aoc2022/day9_t2") #"\n"))
 (def input (clojure.string/split (slurp "resources/aoc2022/day9_1") #"\n"))
-
-input
 
 (defn parse-moves [s]
   (let [[_ a b] (re-matches #"(\w) (\d*)" s)]
@@ -27,62 +26,43 @@ input
       (and (= 1 (abs (- x1 x2))) (= 1 (abs (- y1 y2)))) true
       :else false)))
 
-(is-close [3 1] [4 0])
-(is-close [3 1] [3 1])
+(assert (= true (is-close [3 1] [4 0])))
+(assert (= true (is-close [3 1] [3 1])))
 
 
-(defn calc-tail-2 [current-position tail-position distination length]
+(defn calc-tail [current-position tail-position distination length]
   (loop [cp current-position tp tail-position l length r #{}]
     (if (= l 0) 
       {:cp cp :tp tp :r r}  
       (let [[x1 y1] cp
-            [x2 y2] tp]
+            [x2 y2] tp
+            ic (fn [p r1 r2] (if (is-close p tp) r1 r2))]
         (cond 
-          (= "L" distination) (recur [(dec x1)  y1] (if (is-close [(dec x1) y1] tp) tp cp) (dec l) (if (is-close [(dec x1) y1] tp) r (conj r cp)))
-          (= "R" distination) (recur [(inc x1)  y1] (if (is-close [(inc x1) y1] tp) tp cp) (dec l) (if (is-close [(inc x1) y1] tp) r (conj r cp)))
-          (= "U" distination) (recur [x1 (inc y1)] (if (is-close [x1 (inc y1)] tp) tp cp) (dec l) (if (is-close [x1 (inc y1)] tp) r (conj r cp)))
-          (= "D" distination) (recur [x1 (dec y1)] (if (is-close [x1 (dec y1)] tp) tp cp) (dec l) (if (is-close [x1 (dec y1)] tp) r (conj r cp))))))))
-(abs -1)
+          (= "L" distination) (recur [(dec x1) y1] (ic [(dec x1) y1] tp cp) (dec l) (ic [(dec x1) y1] r (conj r cp)))
+          (= "R" distination) (recur [(inc x1) y1] (ic [(inc x1) y1] tp cp) (dec l) (ic [(inc x1) y1] r (conj r cp)))
+          (= "U" distination) (recur [x1 (inc y1)] (ic [x1 (inc y1)] tp cp) (dec l) (ic [x1 (inc y1)] r (conj r cp)))
+          (= "D" distination) (recur [x1 (dec y1)] (ic [x1 (dec y1)] tp cp) (dec l) (ic [x1 (dec y1)] r (conj r cp))))))))
 
-(rest [1 2 3])
-
-(let [[x y] nil] x)
-
-(calc-tail-2 [0 0] nil "R" 5)
-(calc-tail-2 [1 3] [2 4] "R" 4)
-(calc-tail-2 [4 0] [3 0] "U" 4)
-
-(clojure.set/union #{[0 0]} #{[1 0]})
+(assert (= {:cp [5 0], :tp [4 0], :r #{[0 0] [1 0] [3 0] [2 0] [4 0]}} (calc-tail [0 0] nil "R" 5)))
+(assert (= {:cp [5 3], :tp [4 3], :r #{[4 3] [3 3]}} (calc-tail [1 3] [2 4] "R" 4)))
+(assert (= {:cp [4 4], :tp [4 3], :r #{[4 3] [4 2] [4 1]}} (calc-tail [4 0] [3 0] "U" 4)))
 
 (defn count-positions [m] 
-  (println "\n\n\n\n\n")
   (loop [m m ch [0 0] ct nil r #{[0 0]}]
-    ; (println (first m) ch r)
     (if (empty? m) 
       {:c ch :r r}
       (let [[d l] (first m)
             [x y] ch
             [x2 y2] ct
-            tail (calc-tail-2 ch ct d l)
-            new-r (clojure.set/union r (:r tail))
-            ;bug
-            new-ct (:tp tail)
-            new-ch (:cp tail)
-            
-            ; _ (println "ct" ct new-ct)
-            ]
-        (cond 
-          (= "L" d) (recur (rest m) new-ch new-ct new-r)
-          (= "R" d) (recur (rest m) new-ch new-ct new-r)  
-          (= "U" d) (recur (rest m) new-ch new-ct new-r)
-          (= "D" d) (recur (rest m) new-ch new-ct new-r))))))
+            tail (calc-tail ch ct d l)]
+        (recur (rest m) (:cp tail) (:tp tail) (clojure.set/union r (:r tail)))))))
 
-(->> test-input
-  (map parse-moves)
-  count-positions
-  :r
-  sort
-  count)
+(assert (= 13 (->> test-input
+                (map parse-moves)
+                count-positions
+                :r
+                sort
+                count)))
 
 
 (assert (= 5874 (->> input
@@ -91,95 +71,54 @@ input
                   :r
                   count)))
 
-      
 
-..##..
-...##.
-.####.
-....#.
-s###..
-   
-   
-[2 4] [3 4] 
-[3 3] [4 3]  
-[0 2]       [2 2] [3 2] [4 2]     
-[1 2]             [4 1]
-([0 0] [1 0] [2 0] [3 0] )
+(defn next-point [[x y] d]
+  (case d
+    "L" [(dec x) y]
+    "R" [(inc x) y]
+    "U" [x (inc y)]
+    "D" [x (dec y)]))
 
+(defn recalc-tails [t] 
+  (let [c (count t) ] 
+    (loop [i 1 r t] 
+      (if (= i c)
+        r
+        (let [[x1 y1] (r (dec i))
+              [x2 y2] (r i)
+              new-t (if (and (<= (abs (- x1 x2)) 1) (<= (abs (- y1 y2)) 1)) 
+                      [x2 y2]
+                      [(+ x2 (Integer/signum (- x1 x2))) (+ y2 (Integer/signum (- y1 y2)))])]
+          (recur (inc i) (assoc r i new-t)))))))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+(defn calc-tails [cp ropes d l]
+  (loop [cp cp ropes ropes i 0 result #{[0 0]}]
+    (if (= l i) 
+      {:cp cp :ropes ropes :r result}  
+      (let [[x y] cp
+            np (next-point cp d)]
+        (recur np (recalc-tails (assoc ropes 0 np)) (inc i) (conj result (last ropes)))))))
 
 
-
-
-
-
-
-
-
+(defn count-ropes [m] 
+  (loop [m m cp [0 0] ropes (vec (repeat 10 [0 0])) result #{[0 0]} ]
+    (if (empty? m) 
+      (conj result (last ropes))
+      (let [[d l] (first m)
+            new-result (calc-tails cp ropes d l)]
+        (recur (rest m) (:cp new-result) (:ropes new-result) (clojure.set/union result (:r new-result)))))))
 
 
 
-
-(assert (= 1792 (let[m input
-                     y (count m)
-                     x (count (first m))]
-                  (+ y x x y -4 (count (for [i (range 1 (dec x))
-                                             j (range 1 (dec y))
-                                             :let [e (get-in m [i j])]
-                                             :when (or 
-                                                     (every? #(> e (get-in m [% j])) (range 0 i))
-                                                     (every? #(> e (get-in m [% j])) (range (inc i) x))
-                                                     (every? #(> e (get-in m [i %])) (range 0 j))
-                                                     (every? #(> e (get-in m [i %])) (range (inc j) y)))]
-                                         [i j]))))))
+(assert (= 36 (->> test-input2
+                (map parse-moves)
+                count-ropes
+                count)))
 
 
+(assert (= 2467 (->> input
+                  (map parse-moves)
+                  count-ropes
+                  count)))
 
-(assert (= 8 (let[m test-input
-                  y (count m)
-                  x (count (first m))]
-               (reduce max (for [i (range 1 (dec x))
-                                 j (range 1 (dec y))
-                                 :let [e (get-in m [j i])
-                                       s1 (for [i2 (range (dec i) -1 -1) :while (> e (get-in m [j i2]))]  1)
-                                       s2 (for [i2 (range (inc i) x) :while (> e (get-in m [j i2]))]  [j i2 e (get-in m [i2 j])])
-                                       s3 (for [j2 (range (dec j) -1 -1) :while (> e (get-in m [j2 i]))]  1)
-                                       s4 (for [j2 (range (inc j) y) :while (> e (get-in m [j2 i]))] [j2 i (get-in m [j2 i])])
-              
-                                       s1 (+ (count s1) (if (= (count s1) i) 0 1))
-                                       s2 (+ (count s2) (if (= (count s2) (- x i 1)) 0 1))
-                                       s3 (+ (count s3) (if (= (count s3) j) 0 1))
-                                       s4 (+ (count s4) (if (= (count s4) (- y j 1)) 0 1))]]
-                             (* s1 s2 s3 s4))))))
-
-(assert (= 334880 (let[m input
-                       y (count m)
-                       x (count (first m))
-                       ]
-                    (reduce max (for [i (range 1 (dec x))
-                                      j (range 1 (dec y))
-                                      :let [e (get-in m [j i])
-                                            s1 (for [i2 (range (dec i) -1 -1) :while (> e (get-in m [j i2]))]  1)
-                                            s2 (for [i2 (range (inc i) x) :while (> e (get-in m [j i2]))]  [j i2 e (get-in m [i2 j])])
-                                            s3 (for [j2 (range (dec j) -1 -1) :while (> e (get-in m [j2 i]))]  1)
-                                            s4 (for [j2 (range (inc j) y) :while (> e (get-in m [j2 i]))] [j2 i (get-in m [j2 i])])
-              
-                                            s1 (+ (count s1) (if (= (count s1) i) 0 1))
-                                            s2 (+ (count s2) (if (= (count s2) (- x i 1)) 0 1))
-                                            s3 (+ (count s3) (if (= (count s3) j) 0 1))
-                                            s4 (+ (count s4) (if (= (count s4) (- y j 1)) 0 1))]]
-                                  (* s1 s2 s3 s4))))))
 
