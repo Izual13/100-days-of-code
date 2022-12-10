@@ -28,12 +28,12 @@
 (defn check-password2 [p] 
   (let[[a b] (:indicates p)
        l (:l p)
-       p (:p p)]
-    (println p a b l)
+       p (:p p)
+       l1 (get p (dec a))
+       l2 (get p (dec b))]
     (cond 
-      (and (= l (get p (dec a))) (nil? (get p (dec b)))) true
-      (and (= l (get p (dec a))) (not= l (get p (dec b)))) true
-      (and (= l (get p (dec b))) (not= l (get p (dec a)))) true
+      (and (= l l1) (not= l l2)) true
+      (and (= l l2) (not= l l1)) true
       :else false)))
 
 
