@@ -25,20 +25,17 @@
       r
       (let [v (first a)
             new-r (cond 
-                    (or (= i 20) (= i 60) (= i 100) (= i 140) (= i 180) (= i 220)) (+ r (* acc i))
+                    (= (mod (- i 20) 40) 0) (+ r (* acc i))
                     :else r)]
         (recur (next a) (inc i) (+ v acc) new-r)))))
 
 (assert (= 13140 (->> test-input
                    (mapcat parse-instruction)
-                   (execution))))
+                   execution)))
 
 (assert (= 17180 (->> input
                    (mapcat parse-instruction)
-                   (execution))))
-
-
-
+                   execution)))
 
 (defn execution2 [instructions] 
   (loop [a instructions i 1 acc 1 r ""]
@@ -46,7 +43,7 @@
       r
       (let [v (first a)
             new-r (cond 
-                    (or (= i 40) (= i 80) (= i 120) (= i 160) (= i 200) (= i 240)) "\n"
+                    (= 0 (mod i 40))  "\n"
                     (<= acc (mod i 40) (+ 2 acc)) "#" 
                     :else ".")]
         (recur (next a) (inc i) (+ v acc) (str r new-r))))))
@@ -74,4 +71,3 @@
             "###..#....#..#.###..###..#....#..#.#..#\n"
             "#.#..#....#..#.#....#.#..#....#..#.#..#\n"
             "#..#.####.#..#.#....#..#.####..##..###.\n")))
-
