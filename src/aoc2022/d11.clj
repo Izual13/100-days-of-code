@@ -122,11 +122,6 @@
 
 
 
-
-
-
-
-
 (defn proceed-items2 [i monkeys]
   (let [monkey (monkeys i)
         items (:items monkey)
@@ -138,14 +133,15 @@
         n (:n monkey)
         test (:test monkey)
         [t-true t-false] (:throw monkey)
-        ; _ (println monkey)
+        modul (reduce * (map #(:test %) monkeys))
         ]
     (loop [i items m monkeys]
       (if (empty? i) 
         m
         (let [f (bigint (first i))
               ; _ (println f)
-              tmp (action f (if (nil? n) f (bigint n)))]
+              tmp (action f (if (nil? n) f (bigint n)))
+              tmp (mod tmp modul)]
           (if (= 0 (mod tmp test)) 
             (recur (next i) (-> m
                               (assoc-in [t-true :items] (conj (get-in m [t-true :items]) tmp))
@@ -175,27 +171,21 @@
       (recur (inc i) (proceed-round2 r)))))
 
 
+(assert (= 2713310158
+          (->> test-input
+            (map parse-monkey)
+            vec
+            (proceed-rounds2 10000)
+            (map #(- (:counter %) (count (:items %))))
+            sort
+            (take-last 2)
+            (apply *))))
 
-
-(->> test-input
-  (map parse-monkey)
-  vec
-  (proceed-rounds2 1000)
-  (map #(- (:counter %) (count (:items %))))
-  sort
-  (take-last 2)
-  (apply *))
-
-(6 10 3 5)
-(52 54 6 52)
-(537 469 15 544)
-
-
-(assert (= 10605 (->> test-input
-                   (map parse-monkey)
-                   vec
-                   (proceed-rounds 10000)
-                   (map #(- (:counter %) (count (:items %))))
-                   sort
-                   (take-last 2)
-                   (apply *))))
+(assert (= 15310845153 (->> input
+                         (map parse-monkey)
+                         vec
+                         (proceed-rounds2 10000)
+                         (map #(- (:counter %) (count (:items %))))
+                         sort
+                         (take-last 2)
+                         (apply *))))
