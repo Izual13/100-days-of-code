@@ -9,12 +9,11 @@
 
 (defn parse-input [r] 
   (let [lines (clojure.string/split r #"\n")]
-    {:left (read-string (lines 0)) :right (read-string (lines 1))}))
+    [(read-string (lines 0)) (read-string (lines 1))]))
 
 
 (defn compare-packets 
-  ([p] (let[l (:left p)
-            r (:right p)]
+  ([p] (let[[l r] p]
          (compare-packets l r)))
   
   ([l r] 
@@ -34,14 +33,12 @@
      :else false )))
 
 
+(assert (= false (compare-packets [[[[3]],9]] [[],[2],[]])))
+(assert (= false (compare-packets [[[]]] [[]])))
+(assert (= true (compare-packets [[]] [[[]]])))
 
 
-(assert (= false (compare-packets {:left  [[[[3]],9]] :right [[],[2],[]]})))
-(assert (= false (compare-packets {:left [[[]]] :right [[]]})))
-(assert (= true (compare-packets {:left [[]] :right [[[]]]})))
-
-
-(assert (= true (compare-packets {:left [1,1,3,1,1] :right [1,1,5,1,1]})))
+(assert (= true (compare-packets [1,1,3,1,1] [1,1,5,1,1])))
 (assert (= true (compare-packets [2 3 4] 4)))
 
 (assert (= 13 (->> test-input 
@@ -59,8 +56,35 @@
                   (filter #(not(nil? %)))
                   (reduce +))))
 
+(defn add-dividers [l] 
+  (apply conj l [[[2]] [[6]]]))
 
+(defn find-dividers [l]
+  (loop [l l i 1 r 1] 
+    (cond 
+      (empty? l) r
+      (= (first l) [[2]]) (recur (rest l) (inc i) (* r i))
+      (= (first l) [[6]]) (recur (rest l) (inc i) (* r i))
+      :else (recur (rest l) (inc i) r))))
 
+(assert (= 6 (find-dividers [0 [[2]] [[6]]])))
 
+(assert (= 140 (->> test-input 
+                 (mapcat parse-input)
+                 add-dividers
+                 (sort #(let [c (compare-packets %1 %2)]
+                          (cond
+                            (nil? c) 0
+                            (= true c) -1
+                            :else 1)))
+                 find-dividers)))
 
-
+(assert (= 21836 (->> input 
+                   (mapcat parse-input)
+                   add-dividers
+                   (sort #(let [c (compare-packets %1 %2)]
+                            (cond
+                              (nil? c) 0
+                              (= true c) -1
+                              :else 1)))
+                   find-dividers)))
