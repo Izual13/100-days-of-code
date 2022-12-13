@@ -1,4 +1,4 @@
-(ns aoc2022.d11
+(ns aoc2022.d12
   (:require 
     [clojure.string :as str]
     [clj-async-profiler.core :as prof]))
