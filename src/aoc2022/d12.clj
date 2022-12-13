@@ -74,3 +74,44 @@
                  find-path)))
 
 
+(defn find-reverse-path [m] 
+  (let [max-i (count (m 0))
+        max-j (count m)
+        s (find-letter m \S)
+        e (find-letter m \E)
+        r (vec (for [j (range max-j)]
+                 (vec (for [i (range max-i)] 1000000000))))
+        r (assoc-in r e 0)
+        m (assoc-in m s (int \a))
+        m (assoc-in m e (int \z))]
+    (loop [q (conj [] e) v (conj #{} e) r r]
+      (if (empty? q)
+        (reduce min (for [i (range max-i)
+                          j (range max-j)
+                          :when (= (get-in m [j i]) (int \a))]
+                      (get-in r [j i])))
+        (let [[j i :as p] (first q)
+              rest-q (vec (rest q))
+              n (for [new-p [[j (inc i)] [(dec j) i] [j (dec i)] [(inc j) i]]
+                      :let [[new-j new-i] new-p]
+                      :when (and 
+                              (>= new-i 0)
+                              (>= new-j 0)
+                              (< new-i max-i)
+                              (< new-j max-j)
+                              (not (.contains v new-p))
+                              (>= (- (get-in m new-p) (get-in m p)) -1)
+                              )]
+                  [new-j new-i])]
+          (if (empty? n)
+            (recur rest-q v r)
+            (recur (apply conj rest-q n) (apply conj v n) (update-results p r n))))))))
+
+(assert (= 29 (->> test-input
+                (mapv parse-input)
+                find-reverse-path)))
+
+
+(assert (= 414 (->> input
+                 (mapv parse-input)
+                 find-reverse-path)))
