@@ -53,7 +53,6 @@
 
 (defn build-cave [scans]
   (let [[min-x min-y max-x max-y] (get-max scans)
-        _ (println min-x min-y max-x max-y)
         cave (vec (for [y (range min-y (inc max-y))]
                     (vec (for [x (range min-x (inc max-x))]
                            \.))))]
@@ -73,7 +72,7 @@
           (= (get-in c [(inc y) x]) \.) (recur [(inc y) x] i c)
           (= (get-in c [(inc y) (dec x)]) \.) (recur [(inc y) (dec x)] i c)
           (= (get-in c [(inc y) (inc x)]) \.) (recur [(inc y) (inc x)] i c)
-          (not= (get-in c [0 (- 500 min-x)]) \.) c
+          (not= (get-in c [0 (- 500 min-x)]) \.) i
           (= y max-y) i
           :else (recur [0 (- 500 min-x)] (inc i) (assoc-in c [y x] \o)))))))
 
@@ -88,4 +87,19 @@
                  build-cave
                  execution)))
 
+(defn add-bottom-line [rows] 
+  (let [[min-x min-y max-x max-y] (get-max rows)]
+    (conj rows [{:x 1 :y (+ 1 max-y)} {:x 1000 :y (+ 1 max-y)}])))
+
+(assert (= 93 (->> test-input
+                (mapv parse-input)
+                add-bottom-line
+                build-cave
+                execution)))
+
+(assert (= 29076 (->> input
+                   (mapv parse-input)
+                   add-bottom-line
+                   build-cave
+                   execution)))
 
