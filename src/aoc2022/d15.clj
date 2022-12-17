@@ -8,8 +8,6 @@
 (def input (str/split (slurp "resources/aoc2022/day15_1") #"\n"))
 
 
-test-input
-
 (defn calc-length [p1 p2]
   (let [[x1 y1] p1
         [x2 y2] p2]
@@ -54,59 +52,6 @@ test-input
 
 (check-point [{:s [2 18], :b [-2 15], :l 7}] [0 100])
 
-(defn get-borders [max-c sensor] 
-  (let [l (inc (:l sensor))
-        [x y] (:s sensor)
-        b1 (for [i (range (inc l))
-                 :let [new-x (- (+ x l) i) 
-                       new-y (- y i)]
-                 :while (and (<= 0 new-x max-c) (<= 0 new-y max-c))] 
-             [new-x new-y])
-        b2 (for [i (range (inc l))
-                 :let [new-x (- (+ x l) i) 
-                       new-y (+ y i)]
-                 :while (and (<= 0 new-x max-c) (<= 0 new-y max-c))] 
-             [new-x new-y])
-        b3 (for [i (range (inc l))
-                 :let [new-x (+ (- x l) i) 
-                       new-y (- y i)]
-                 :while (and (<= 0 new-x max-c) (<= 0 new-y max-c))] 
-             [new-x new-y])
-        b4 (for [i (range (inc l))
-                 :let [new-x (+ (- x l) i) 
-                       new-y (+ y i)]
-                 :while (and (<= 0 new-x max-c) (<= 0 new-y max-c))] 
-             [new-x new-y])
-        ; b1 (for [i (range (inc l))] [(- (+ x l) i) (- y i)])
-        ; b2 (for [i (range (inc l))] [(- (+ x l) i) (+ y i)])
-        ; b3 (for [i (range (inc l))] [(+ (- x l) i) (- y i)])
-        ; b4 (for [i (range (inc l))] [(+ (- x l) i) (+ y i)])
-        ] 
-    (set (concat b1 b2 b3 b4))))
-
-(defn get-borders [max-c sensor] 
-  (let [l (inc (:l sensor))
-        [x y] (:s sensor)
-        b1 [(+ x l) y]
-        b2 [(- x l) y]
-        b3 [x (+ y l)]
-        b4 [x (- y l)]]
-    (set [ b1 b2 b3 b4])))
-
-
-
-(assert (= #{[1 1] [0 2] [2 0]}
-          (get-borders 20 {:s [0 0], :b [-2 15], :l 1})))
-
-(get-borders 20 {:s [0 0], :b [-2 15], :l 1})
-
-(assert (= #{[6 6] [5 3] [4 6] [5 7] [6 4] [4 4] [7 5] [3 5]}
-          (get-borders 20 {:s [5 5], :b [-2 15], :l 1})))
-
-
-(concat [1 2] [3 4] [5 6])
-
-
 (defn count-positions [row sensors]
   (let [min-x (reduce min (map #(- (first (:s %)) (:l %)) sensors))
         max-x (reduce max (map #(+ (first (:s %)) (:l %)) sensors))
@@ -131,77 +76,72 @@ test-input
 
 
 
+;    private fun getRangesForRow(row: Int): List<IntRange> {
+;     return pairs.mapNotNull { (sensor, beacon) ->
+;         val distance = sensor distanceTo beacon
+;         val begin = sensor.x - distance + abs(row - sensor.y)
+;         val end = sensor.x + distance - abs(row - sensor.y)
+;         (begin..end).takeUnless { it.isEmpty() }
+;     }.sortedBy { it.first }
+; }
+
+;{:s [214540 3768792], :b [-355567 3900317], :l 701632}
+(defn get-ranges[row sensors] 
+  (loop [s sensors r []]
+    (if (empty? s)
+      r
+      (let [f (first s)
+            [x y] (:s f)
+            d (:l f)
+            b (+ (- x d) (abs (- row y)))
+            e (- (+ x d) (abs (- row y)))]
+        (if (> b e) 
+          (recur (next s) r)
+          (recur (next s) (conj r [b e])))))))
+
+(defn merge-ranges[ranges]
+  (loop [r (sort ranges) result []]
+    (cond 
+      (empty? r) result
+      (empty? result) (recur (next r) (conj result (first r)))
+      :else (let [[rb re] (last result)
+                  i (dec (count result))
+                  [b e] (first r)
+                  ; _ (println r result rb re i b e)
+                  ]
+              (if (<= rb b re) 
+                (recur (next r) (assoc result i [rb (max re e)]))
+                (recur (next r) (conj result [b e])))))))
+
+(defn count-ranges [ranges] 
+  (loop [r (sort ranges) result 0]
+    (if 
+      (empty? r) result
+      (let [[b e] (first r)]
+        (recur (next r) (+ (- e b)))))))
+
+(assert (= 26 (->> test-input
+                (mapv parse-input)
+                (get-ranges 10)
+                (merge-ranges)
+                (count-ranges))))
+
+(time (->> input
+        (mapv parse-input)
+        (get-ranges 2000000)
+        (merge-ranges)
+        (count-ranges)))
+(comment 
+  (loop [i 0]
+    (let [ranges (->> input
+                   (mapv parse-input)
+                   (get-ranges i)
+                   (merge-ranges))
+          _ (if (= 0 (mod i 10000)) (println i) nil)]
+      (if (> (count ranges) 1) 
+        [i ranges]
+        (recur (inc i))))))
 
 
 
-
-
-
-
-
-
-
-
-
-(defn count-positions2 [max-c sensors]
-  (let [borders (set (mapcat #(get-borders max-c %) sensors))
-        borders (filter (fn [[x y]] (and (<= 0 x max-c) (<= 0 y max-c))) borders)
-        ; _ (println borders)
-        points (for [p borders
-                     :when (not (check-point sensors p))] p)
-        ]
-    
-    points))
-
-(->> test-input
-  (mapv parse-input)
-  (count-positions2 20))
-
-(defn find-points [max-c sensors]
-  ; (let [points (map :s sensors) ]
-  (set (concat (for [s1 sensors
-                     s2 sensors
-                     :let [p1 (:s s1)
-                           p2 (:s s2)
-                           l (calc-length p1 p2)]
-                     :when (and 
-                             (= (- l (:l s1) (:l s2)) 2)
-                             (<= 0 (first p1) max-c) 
-                             (<= 0 (second p1) max-c)
-                             (<= 0 (first p2) max-c) 
-                             (<= 0 (second p2) max-c)
-                             (not= p1 p2))]
-                 [(int (/ (+ (first p1) (first p2)) 2)) (int (/ (+ (second p1) (second p2)) 2))] ))))
-
-
-(defn part2 [max-c sensors]
-  (let [points (find-points max-c sensors)
-        points (set (mapcat (fn [[x y]] [[x y] 
-                                    [x (inc y)] [x (dec y)] 
-                                    [(inc x) y] [(dec x) y]
-                                    [(inc x) (inc y)] [(dec x) (dec y)]]) points))
-        points (for [p points
-                     :when (not (check-point sensors p))] p)] points))
-
-
-
-
-(->> test-input
-  (mapv parse-input)
-  ; (count-positions3 4000000)
-  (part2 20)
-  )
-
-#{[15 12] [11 0] [11 12] [14 4] [9 13] [14 10]}
-
-
-(->> input
-  (mapv parse-input)
-  (part2 4000000)
-  )
-
-(let [borders [[3428967 2493192] [2121465 3703050] [2281431 3228484] [2774120 2735795] [3995854 3578627]]
-      sensors (->> input
-                (mapv parse-input))
-      points (for [p borders
-                   :when (not (check-point sensors p))] p)] points)
+(assert (= 12413999391794 (+ (* 3103499 4000000) 3391794)))
