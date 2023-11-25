@@ -16,3 +16,10 @@
 ##### warn-on-reflection
 > (set! *warn-on-reflection* true)
 >
+
+##### for windows
+> Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://github.com/clojure/brew-install/releases/latest/download/win-install.ps1')
+> 
+> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted
+>
+> clj -M:repl
