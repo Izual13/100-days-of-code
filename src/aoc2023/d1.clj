@@ -14,11 +14,7 @@
         (cond 
           (not (< -1 x 10)) (recur (next s) f l)
           (nil? f) (recur (next s) x l)
-          :else (recur (next s) f x)
-        )))))
-
-
-
+          :else (recur (next s) f x))))))
 
 (assert (= 54304
           (reduce + (map #(calibrate (vec %1)) doc))))
@@ -50,15 +46,6 @@
          (nil? f) (recur (inc i) x l)
          :else (recur (inc i) f x)))))))
 
+(assert (= 281 (reduce + (map calibrate-v2 doc-t2))))
 
-
-(map #(calibrate-v2 %1) doc-t2)
-
-(reduce + (map #(calibrate-v2 %1) doc))
-
-
-(assert (= 281
-          (reduce + (map calibrate-v2 doc-t2))))
-
-(assert (= 54418
-          (reduce + (map calibrate-v2 doc))))
+(assert (= 54418 (reduce + (map calibrate-v2 doc))))
