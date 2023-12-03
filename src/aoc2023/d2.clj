@@ -39,17 +39,6 @@
           (= "blue" clr)  (recur (next p) r g (max b (Integer/parseInt cnt)))
           :else (recur (next p) r g b))))))
 
-
-(assert (= false
-          (check-game 12 13 14 [95 ["7 blue" "14 red" "9 blue" "17 red" "2 blue" "1 green" "4 red"]])))
-
-(assert (= true
-          (check-game 12 13 14 [1 ["3 blue" "4 red" "1 red" "2 green" "6 blue" "2 green"]])))
-
-(assert (= 48
-          (check-game-v2 [1 ["3 blue" "4 red" "1 red" "2 green" "6 blue" "2 green"]])))
-
-
 (assert (= 8 (->> 
   games-t
   (map parse-game)
@@ -62,6 +51,20 @@
   (map parse-game)
   (map check-game-v2)
   (apply +))))
+
+
+
+(assert (= false
+          (check-game 12 13 14 [95 ["7 blue" "14 red" "9 blue" "17 red" "2 blue" "1 green" "4 red"]])))
+
+(assert (= true
+          (check-game 12 13 14 [1 ["3 blue" "4 red" "1 red" "2 green" "6 blue" "2 green"]])))
+
+(assert (= 48
+          (check-game-v2 [1 ["3 blue" "4 red" "1 red" "2 green" "6 blue" "2 green"]])))
+
+
+
 
 
 (assert (= 2162 (->> 
