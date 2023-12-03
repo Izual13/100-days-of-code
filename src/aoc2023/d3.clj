@@ -9,7 +9,6 @@
   (let [points [(get-in p [(dec i) (dec j)]) (get-in p [i (dec j)]) (get-in p [(inc i) (dec j)])
                 (get-in p [(dec i) j]) (get-in p [(inc i) j])
                 (get-in p [(dec i) (inc j)]) (get-in p [i (inc j)]) (get-in p [(inc i) (inc j)])]]
-    (println "points" points)
     (not (every? #(or (nil? %1) (= %1 \.) (Character/isDigit %1)) points))))
   
 
@@ -17,7 +16,6 @@
   (let [c (count s)]
     (loop [i 0 j 0 n "" is-e false r []]
 		(let [p (get-in s [j i])]
-        (println i j n is-e r p)
         (cond 
           (and (= j c) is-e (not (empty? n))) (conj r (Integer/parseInt n))
           (and (= j c) (not is-e)) r
@@ -58,7 +56,6 @@
   (loop [n (str (get-in p [i j])) s (dec j) e (inc j)]
     (let [l (get-in p [i s])
           r (get-in p [i e])]
-      (println i j l r n)
     (cond 
       (and (nil? l) (nil? r)) (Integer/parseInt n)
       (and (not (nil? l)) (Character/isDigit l)) (recur (str l n) (dec s) e)
@@ -82,20 +79,21 @@
 (defn find-gears [s] 
   (let [c (count s)]
     (loop [i 0 j 0 r []]
-      (println "r" r)
-		(let [p (get-in s [j i])]
+		  (let [p (get-in s [j i])]
         (cond 
           (= j c) (apply + r)
           (= i c) (recur 0 (inc j) r)
           (= p \*) (recur (inc i) j (conj r (find-gear s i j)))
-      :else (recur (inc i) j r))))))
+        :else (recur (inc i) j r))))))
 
 
 (assert (= 467835 (->> schematic-t
                       (mapv vec)
                       find-gears)))
 
-
+(time (->> schematic
+                      (mapv vec)
+                      find-gears))
 
 (assert (= 76314915 (->> schematic
                       (mapv vec)

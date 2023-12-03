@@ -8,9 +8,8 @@
 
 (defn parse-game [s]
   (let [[_ id parts] (re-matches #"Game (\d*): (.*)" s)
-        parts (clojure.string/split parts #"; ")
-        parts (map #(clojure.string/split %1 #", ") parts)]
-    [(Integer/parseInt id) (vec (flatten parts))]))
+        parts (clojure.string/split parts #"; |, ")]
+    [(Integer/parseInt id) parts]))
 
 
 (defn check-game [red green blue [id parts]]
