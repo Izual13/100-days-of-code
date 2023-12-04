@@ -18,38 +18,38 @@
       (or (> r red) (> g green) (> b blue)) false
       (empty? p) true
       :else (let [f (first p)
-            [_ cnt clr] (re-matches #"(\d*) (.*)" f)]
-        (cond 
-          (= "red" clr)   (recur (next p) (Integer/parseInt cnt) g b)
-          (= "green" clr) (recur (next p) r (Integer/parseInt cnt) b)
-          (= "blue" clr)  (recur (next p) r g (Integer/parseInt cnt))
-          :else (recur (next p) r g b))))))
+                  [_ cnt clr] (re-matches #"(\d*) (.*)" f)]
+              (cond 
+                (= "red" clr)   (recur (next p) (Integer/parseInt cnt) g b)
+                (= "green" clr) (recur (next p) r (Integer/parseInt cnt) b)
+                (= "blue" clr)  (recur (next p) r g (Integer/parseInt cnt))
+                :else (recur (next p) r g b))))))
 
 (defn check-game-v2 [[id parts]]
   (loop [p parts r 0 g 0 b 0]
     (cond 
       (empty? p) (* r g b)
       :else (let [f (first p)
-            [_ cnt clr] (re-matches #"(\d*) (.*)" f)
-            ]
-        (cond 
-          (= "red" clr)   (recur (next p) (max r (Integer/parseInt cnt)) g b)
-          (= "green" clr) (recur (next p) r (max g (Integer/parseInt cnt)) b)
-          (= "blue" clr)  (recur (next p) r g (max b (Integer/parseInt cnt)))
-          :else (recur (next p) r g b))))))
+                  [_ cnt clr] (re-matches #"(\d*) (.*)" f)
+                  ]
+              (cond 
+                (= "red" clr)   (recur (next p) (max r (Integer/parseInt cnt)) g b)
+                (= "green" clr) (recur (next p) r (max g (Integer/parseInt cnt)) b)
+                (= "blue" clr)  (recur (next p) r g (max b (Integer/parseInt cnt)))
+                :else (recur (next p) r g b))))))
 
 (assert (= 8 (->> 
-  games-t
-  (map parse-game)
-  (filter #(check-game 12 13 14 %1))
-  (map first)
-  (apply +))))
+               games-t
+               (map parse-game)
+               (filter #(check-game 12 13 14 %1))
+               (map first)
+               (apply +))))
 
 (assert (= 2286 (->> 
-  games-t
-  (map parse-game)
-  (map check-game-v2)
-  (apply +))))
+                  games-t
+                  (map parse-game)
+                  (map check-game-v2)
+                  (apply +))))
 
 
 
@@ -67,16 +67,16 @@
 
 
 (assert (= 2162 (->> 
-  games
-  (map parse-game)
-  (filter #(check-game 12 13 14 %1))
-  (map first)
-  (apply +))))
+                  games
+                  (map parse-game)
+                  (filter #(check-game 12 13 14 %1))
+                  (map first)
+                  (apply +))))
 
 (assert (= 72513 (->> 
-  games
-  (map parse-game)
-  (map check-game-v2)
-  (apply +))))
+                   games
+                   (map parse-game)
+                   (map check-game-v2)
+                   (apply +))))
 
 

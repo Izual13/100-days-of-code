@@ -27,24 +27,24 @@
 (defn calibrate-v2 [s] 
   (let [c (count s)]
     (loop [i 0 f nil l nil]
-    (if (= i c) (+ (* 10 f) (if (nil? l) f l))
-     (let [x (get s i)
-           x (cond 
-          (< 47 (int x) 58) (- (int x) 48)
-          (.startsWith s "one" i) 1
-          (.startsWith s "two" i) 2
-          (.startsWith s "three" i) 3
-          (.startsWith s "four" i) 4
-          (.startsWith s "five" i) 5
-          (.startsWith s "six" i) 6
-          (.startsWith s "seven" i) 7
-          (.startsWith s "eight" i) 8
-          (.startsWith s "nine" i) 9
-       :else nil)]
-       (cond 
-         (nil? x) (recur (inc i) f l)
-         (nil? f) (recur (inc i) x l)
-         :else (recur (inc i) f x)))))))
+      (if (= i c) (+ (* 10 f) (if (nil? l) f l))
+        (let [x (get s i)
+              x (cond 
+                  (< 47 (int x) 58) (- (int x) 48)
+                  (.startsWith s "one" i) 1
+                  (.startsWith s "two" i) 2
+                  (.startsWith s "three" i) 3
+                  (.startsWith s "four" i) 4
+                  (.startsWith s "five" i) 5
+                  (.startsWith s "six" i) 6
+                  (.startsWith s "seven" i) 7
+                  (.startsWith s "eight" i) 8
+                  (.startsWith s "nine" i) 9
+                  :else nil)]
+          (cond 
+            (nil? x) (recur (inc i) f l)
+            (nil? f) (recur (inc i) x l)
+            :else (recur (inc i) f x)))))))
 
 (assert (= 281 (reduce + (map calibrate-v2 doc-t2))))
 
