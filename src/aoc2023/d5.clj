@@ -39,7 +39,7 @@ almanac-t
 (parse-almanac almanac-t)
 
 
-[[79 14 55 13] ([50 98 2] [52 50 48])]
+
 
 
 ["seeds: 79 14 55 13"
@@ -86,8 +86,6 @@ almanac-t
                    (mmap hl))))
 
 
-(for [i [1 2 3]] i)
-
 (assert (= 35 (->> almanac-t
                 parse-almanac
                 processing
@@ -104,12 +102,12 @@ almanac-t
 ;; part 2
 
 (defn multi [x l]
-  (vec (for [i (range l)] (+ x i))))
+  (for [i (range l)] (+ x i)))
 
 (defn parse-almanac-v2 [[seeds ss sf fw wl lt th hl]] 
   (let [[_ seeds] (re-matches #"seeds: (.*)" seeds)
-        seeds (parse-array seeds)]
-    {:seeds (vec (mapcat (fn [[x l]] (multi x l)) (partition 2 seeds)))
+        seeds  (parse-array seeds)]
+    {:seeds (mapv (fn [[f s]] [f (+ f s)]) (partition 2 seeds))
      :ss (parse-array-ignore-first-raw ss)
      :sf (parse-array-ignore-first-raw sf)
      :fw (parse-array-ignore-first-raw fw)
@@ -118,10 +116,12 @@ almanac-t
      :th (parse-array-ignore-first-raw th)
      :hl (parse-array-ignore-first-raw hl)}))
 
-
+(vec (mapcat (fn [[x l]] (multi x l))))
 
 (multi 10 10)
 
+(->> almanac-t
+  parse-almanac-v2)
 
 
 ; (defn mmap-v2 [seed maps] 
@@ -138,25 +138,64 @@ almanac-t
 
 ; (mmap-v2 [2988689842 2988689842] [[2988689842 2988689842 2] [52 50 48]])
 
+
+;(+ n (- d s))
+
+(defn mmap-v2 [maps seeds] 
+  (loop [seeds seeds m maps r []]
+    (cond 
+      (empty? seeds) r
+      (empty? m) (apply conj r seeds)
+      :else (let [[start end] (first seeds)
+                  [d s l] (first m)
+                  ; _ (println seeds m
+                  ;     (and (< start s) (< end (+ s l))) 
+                  ;     " "
+                  ;     (and (> start s) (> end (+ s l)))
+                  ;     " "
+                  ;     (and (>= start s) (<= end (+ s l)))
+                  ;     " "
+                  ;     (and (< start s) (> end (+ s l)))
+                  ;     )
+                  ]
+              (if (or (< end s) (> start (+ s l)))
+                (recur seeds (next m) r)
+                (cond 
+                  (and (< start s) (< end (+ s l))) (recur (conj (next seeds) [start (dec s)]) maps (conj r [d (- (+ end d) s)]))
+                  (and (> start s) (> end (+ s l))) (recur (conj (next seeds) [(+ s l 1) end]) maps (conj r [(- (+ start d) s) (+ l d)]))
+                  (and (>= start s) (<= end (+ s l))) (recur (next seeds) (next m) (conj r [(- (+ start d) s) (- (+ end d) s)]))
+                  (and (< start s) (> end (+ s l))) (recur (conj (next seeds) [start (dec s)] [(+ s l 1) end]) maps (conj r [d (+ l d)]))
+                  :else (recur (next seeds) (next m) r)))))))
   
-; (defn processing-v2 [{seeds :seeds ss :ss sf :sf fw :fw wl :wl lt :lt th :th hl :hl}]
-;   (for [s seeds] (-> s
-;                    vec
-;                    (mmap-v2 ss)
-;                    (mmap-v2 sf)
-;                    (mmap-v2 fw)
-;                    (mmap-v2 wl)
-;                    (mmap-v2 lt)
-;                    (mmap-v2 th)
-;                    (mmap-v2 hl))))
+
+
+(defn processing-v2 [{seeds :seeds ss :ss sf :sf fw :fw wl :wl lt :lt th :th hl :hl}]
+
+    (->> seeds
+      (mmap-v2 ss)
+      (mmap-v2 sf)
+      (mmap-v2 fw)
+      (mmap-v2 wl)
+      (mmap-v2 lt)
+      (mmap-v2 th)
+      (mmap-v2 hl)
+      ))
+
+(println "\n\n\n")
 
 (->> almanac-t
   parse-almanac-v2
-  processing
-  (apply min))
+  processing-v2
+  flatten
+  (apply min)
+  )
 
-(time (->> almanac
-        parse-almanac-v2
-        ;processing
-        ;(apply min)
-        ))
+
+
+(->> almanac
+  parse-almanac-v2
+  processing-v2
+  flatten
+  (apply min)  )
+
+824872000
