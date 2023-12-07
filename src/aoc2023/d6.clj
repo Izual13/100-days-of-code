@@ -21,7 +21,6 @@
 
 (defn count-win [[time distance]] 
   (loop [t time c 0]
-    ; (println t distance c)
     (cond 
       (= t 0) c
       (> (* t (- time t)) distance) (recur (dec t) (inc c))
@@ -49,6 +48,11 @@
         [_ d] (re-matches #"Distance: +(.*)" distance)]
     [(Long/parseLong (clojure.string/replace t #" +" "")) (Long/parseLong (clojure.string/replace d #" +" ""))]))
 
+(defn count-win-v2 [[time distance]] 
+  (let [d (- (* time time) (* 4 distance))
+        x (int (/ (- time (Math/sqrt d)) 2))]
+    (int (- time x x 1))))
+
 (assert (= 71503 (->> document-t
                    parse-document-v2
                    count-win)))
@@ -56,3 +60,11 @@
 (assert (= 29891250 (->> document
                       parse-document-v2
                       count-win)))
+
+(assert (= 71503 (->> document-t
+                   parse-document-v2
+                   count-win-v2)))
+
+(assert (= 29891250 (->> document
+                      parse-document-v2
+                      count-win-v2)))
