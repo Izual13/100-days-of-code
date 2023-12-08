@@ -26,33 +26,30 @@
 
 (defn compare-puzzle [[f _] [s _]] 
   (let [ff (sort compare-frequencies (frequencies f))
-        sf (sort compare-frequencies (frequencies s))
-        r (cond 
-            (> (second (last ff)) (second (last sf))) 1
-            (< (second (last ff)) (second (last sf))) -1
-            (< (count ff) (count sf)) 1
-            (> (count ff) (count sf)) -1
-            (> (get-card f 0) (get-card s 0)) 1
-            (< (get-card f 0) (get-card s 0)) -1
+        sf (sort compare-frequencies (frequencies s))]
+    (cond 
+      (> (second (last ff)) (second (last sf))) 1
+      (< (second (last ff)) (second (last sf))) -1
+      (< (count ff) (count sf)) 1
+      (> (count ff) (count sf)) -1
+      (> (get-card f 0) (get-card s 0)) 1
+      (< (get-card f 0) (get-card s 0)) -1
             
-            (> (get-card f 1) (get-card s 1)) 1
-            (< (get-card f 1) (get-card s 1)) -1
+      (> (get-card f 1) (get-card s 1)) 1
+      (< (get-card f 1) (get-card s 1)) -1
             
-            (> (get-card f 2) (get-card s 2)) 1
-            (< (get-card f 2) (get-card s 2)) -1
+      (> (get-card f 2) (get-card s 2)) 1
+      (< (get-card f 2) (get-card s 2)) -1
             
-            (> (get-card f 3) (get-card s 3)) 1
-            (< (get-card f 3) (get-card s 3)) -1
+      (> (get-card f 3) (get-card s 3)) 1
+      (< (get-card f 3) (get-card s 3)) -1
             
-            (> (get-card f 4) (get-card s 4)) 1
-            (< (get-card f 4) (get-card s 4)) -1
+      (> (get-card f 4) (get-card s 4)) 1
+      (< (get-card f 4) (get-card s 4)) -1
             
-            (> (get-card f 5) (get-card s 5)) 1
-            (< (get-card f 5) (get-card s 5)) -1
-            :else 0
-            )]
-    
-    r))
+      (> (get-card f 5) (get-card s 5)) 1
+      (< (get-card f 5) (get-card s 5)) -1
+      :else 0)))
 
 (assert (= `(["2AAAA" 2] ["33332" 1]) (sort compare-puzzle [["33332" 1] ["2AAAA" 2]])))
 (assert (= `(["KJJJT" 2] ["23332" 1]) (sort compare-puzzle [["23332" 1] ["KJJJT" 2]])))
@@ -60,9 +57,6 @@
 (assert (= `(["T55J5" 2] ["QQQJA" 1]) (sort compare-puzzle [["QQQJA" 1] ["T55J5" 2]])))
 (assert (= `(["KTJJT" 2] ["KK677" 1]) (sort compare-puzzle [["KK677" 1] ["KTJJT" 2]])))
 (assert (= `(["KK677" 1] ["T55J5" 2]) (sort compare-puzzle [["KK677" 1] ["T55J5" 2]])))
-
-
-
 
 
 (defn calc [s] 
@@ -108,28 +102,25 @@
 
 (defn compare-puzzle-v2 [[f _] [s _]] 
   (let [ff (replace-j f)
-        sf (replace-j s)        
-        r (cond 
-            (> (second (last ff)) (second (last sf))) 1
-            (< (second (last ff)) (second (last sf))) -1
-            (< (count ff) (count sf)) 1
-            (> (count ff) (count sf)) -1
-            (> (get-card-v2 f 0) (get-card-v2 s 0)) 1
-            (< (get-card-v2 f 0) (get-card-v2 s 0)) -1
-            (> (get-card-v2 f 1) (get-card-v2 s 1)) 1
-            (< (get-card-v2 f 1) (get-card-v2 s 1)) -1
-            (> (get-card-v2 f 2) (get-card-v2 s 2)) 1
-            (< (get-card-v2 f 2) (get-card-v2 s 2)) -1
-            (> (get-card-v2 f 3) (get-card-v2 s 3)) 1
-            (< (get-card-v2 f 3) (get-card-v2 s 3)) -1
-            (> (get-card-v2 f 4) (get-card-v2 s 4)) 1
-            (< (get-card-v2 f 4) (get-card-v2 s 4)) -1
-            (> (get-card-v2 f 5) (get-card-v2 s 5)) 1
-            (< (get-card-v2 f 5) (get-card-v2 s 5)) -1
-            :else 0
-            )]
-    
-    r))
+        sf (replace-j s)]
+    (cond 
+      (> (second (last ff)) (second (last sf))) 1
+      (< (second (last ff)) (second (last sf))) -1
+      (< (count ff) (count sf)) 1
+      (> (count ff) (count sf)) -1
+      (> (get-card-v2 f 0) (get-card-v2 s 0)) 1
+      (< (get-card-v2 f 0) (get-card-v2 s 0)) -1
+      (> (get-card-v2 f 1) (get-card-v2 s 1)) 1
+      (< (get-card-v2 f 1) (get-card-v2 s 1)) -1
+      (> (get-card-v2 f 2) (get-card-v2 s 2)) 1
+      (< (get-card-v2 f 2) (get-card-v2 s 2)) -1
+      (> (get-card-v2 f 3) (get-card-v2 s 3)) 1
+      (< (get-card-v2 f 3) (get-card-v2 s 3)) -1
+      (> (get-card-v2 f 4) (get-card-v2 s 4)) 1
+      (< (get-card-v2 f 4) (get-card-v2 s 4)) -1
+      (> (get-card-v2 f 5) (get-card-v2 s 5)) 1
+      (< (get-card-v2 f 5) (get-card-v2 s 5)) -1
+      :else 0)))
 
 (assert (= 5905 (->> puzzles-t
                   (map parse-puzzle)
