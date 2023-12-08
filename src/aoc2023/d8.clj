@@ -93,7 +93,6 @@ network-t
   (for [p (filterv #(= \A (last %1)) (keys maps))]
     (loop [i instructions p p c 0]
       (cond 
-        (= (last p) \Z) c
         (and (empty? i) (= (last p) \Z)) c
         (empty? i) (recur instructions p c)
         :else (let [f (first i)]
