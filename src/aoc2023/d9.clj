@@ -13,7 +13,7 @@
   (loop [m (vec m) r (last m)]
     (if (= (count (frequencies m)) 1)
       r
-      (let [new-m (vec (map-indexed #(- %2 (get m %1)) (next m)))]
+      (let [new-m (vec (map-indexed #(- %2 (nth m %1)) (next m)))]
         (recur new-m (+ r (last new-m)))))))
 
 (assert (= 18 (calc [0 3 6 9 12 15])))
@@ -26,18 +26,15 @@
 
 
 (assert (= 114 (->> history-t
-                 (map parse-array)
-                 (map calc)
+                 (map (comp calc parse-array))
                  (apply +))))
 
 (assert (= 2 (->> history-t
                (map (comp calc reverse parse-array))
                (apply +))))
 
-
 (assert (= 1789635132 (->> history
-                        (map parse-array)
-                        (map calc)
+                        (map (comp calc parse-array))
                         (apply +))))
 
 (assert (= 913 (->> history
