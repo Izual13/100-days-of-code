@@ -7,17 +7,15 @@
 
 (defn parse-array [s] 
   (let [r (clojure.string/split s #" +")]
-    (mapv #(Integer/parseInt %1) r)))
+    (map #(Integer/parseInt %1) r)))
 
 
 (defn calc [m] 
   (loop [m m r (last m)]
     (if (= (count(frequencies m)) 1)
       r
-      (let [new-m (map-indexed (fn [idx itm] 
-                                 (- itm (get m idx))) (next m))]
-        (recur (vec new-m) (+ r (last new-m)))))))
-
+      (let [new-m (vec (map-indexed #(- %2 (get m %1)) (next m)))]
+        (recur new-m (+ r (last new-m)))))))
 
 (assert (= 18 (calc [0 3 6 9 12 15])))
 (assert (= -3 (calc [15 12 9 6 3 0])))
