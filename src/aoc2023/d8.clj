@@ -34,9 +34,8 @@ network-t
 
 (assert (= {"AAA" ["BBB" "CCC"]} (let [[_ a b c] (re-matches #"(\w+) = \((\w+), (\w+)\)" "AAA = (BBB, CCC)")] {a [b c]})))
 
-(defn find-path [{instructions :instructions maps :maps }] 
+(defn find-path [{instructions :instructions maps :maps}] 
   (loop [i instructions p "AAA" c 0]
-    ; (println i p c maps)
     (cond 
       (= p "ZZZ") c
       (empty? i) (recur instructions p c)
@@ -89,7 +88,7 @@ network-t
 
 (assert (= 13663968099527 (lcm-of-list [17621 11309 20777 13939 15517 19199])))
 
-(defn find-path-v3 [{instructions :instructions maps :maps }]
+(defn find-path-v3 [{instructions :instructions maps :maps}]
   (for [p (filterv #(= \A (last %1)) (keys maps))]
     (loop [i instructions p p c 0]
       (cond 
