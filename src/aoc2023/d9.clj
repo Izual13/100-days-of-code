@@ -9,10 +9,9 @@
   (let [r (clojure.string/split s #" +")]
     (map #(Integer/parseInt %1) r)))
 
-
 (defn calc [m] 
-  (loop [m m r (last m)]
-    (if (= (count(frequencies m)) 1)
+  (loop [m (vec m) r (last m)]
+    (if (= (count (frequencies m)) 1)
       r
       (let [new-m (vec (map-indexed #(- %2 (get m %1)) (next m)))]
         (recur new-m (+ r (last new-m)))))))
@@ -32,7 +31,7 @@
                  (apply +))))
 
 (assert (= 2 (->> history-t
-               (map (comp calc vec reverse parse-array))
+               (map (comp calc reverse parse-array))
                (apply +))))
 
 
@@ -42,5 +41,5 @@
                         (apply +))))
 
 (assert (= 913 (->> history
-                 (map (comp calc vec reverse parse-array))
+                 (map (comp calc reverse parse-array))
                  (apply +))))
