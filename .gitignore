@@ -18,3 +18,4 @@ ws.code-workspace
 .calva/
 .clj-kondo/
 .lsp/
+tmp/
