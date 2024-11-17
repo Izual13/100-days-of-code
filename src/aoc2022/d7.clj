@@ -128,14 +128,3 @@
                      calc-directories
                      sorted-used-space
                      calc-enough-space)))
-
-
-(comment 
-  (do
-    (vec (for [i (range 1000)] (optimized-find-marker input 4)))
-    (println "start profiling")
-    (prof/start)
-    (optimized-find-marker input 4)
-    (println (prof/stop))
-    (println "end profiling"))
-  )
