@@ -22,14 +22,14 @@
                 (= k "jmp") (recur (+ i n) r (conj v i))
                 :else v)))))
 
-(->> test-program
+(assert (= 5 (->> test-program
   (mapv parse-program)
-  execute)
+  execute)))
 
 
-(->> program
+(assert (= 1744 (->> program
   (mapv parse-program)
-  execute)
+  execute)))
 
 
 (defn fixed-execute [fixed p] 
