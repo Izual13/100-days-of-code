@@ -57,9 +57,7 @@
         (cond 
           (contains? v f) (v f)
           (empty? (m f)) 0
-          :else (+ (apply + (map first (m f))) (apply + (for [i (m f)] (* (first i) (count-bags (second i) v m)))))
-          ; :else (count (m f))
-        )))))
+          :else (+ (apply + (map first (m f))) (apply + (for [i (m f)] (* (first i) (count-bags (second i) v m))))))))))
       
 (assert (= 126 (->> test2-luggage
   (mapv parse-luggage)
