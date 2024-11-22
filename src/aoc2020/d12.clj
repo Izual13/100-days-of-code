@@ -73,6 +73,6 @@
   (map parse-instruction)
   execute-with-waypoint)))
 
-(->> instructions
+(assert (= 30761 (->> instructions
   (map parse-instruction)
-  execute-with-waypoint)
+  execute-with-waypoint)))
