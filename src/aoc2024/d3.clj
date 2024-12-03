@@ -25,7 +25,7 @@
   (map calculate)
   (apply +))))
 
-(defn extended-find-all-mul [s]
+(defn extended-find-all-commands [s]
   (re-seq #"mul\(\d+,\d+\)|don't\(\)|do\(\)" s))
 
 (defn extended-calculate [s]
@@ -42,16 +42,16 @@
           :else (recur (next s) enable r))))))
 
 (assert (= 161 (->> test_memory
-  (map extended-find-all-mul)
+  (map extended-find-all-commands)
   flatten
   extended-calculate)))
 
 (assert (= 48 (->> test_memory-2
-  (map extended-find-all-mul)
+  (map extended-find-all-commands)
   flatten
   extended-calculate)))
 
 (assert (= 90669332 (->> memory
-  (map extended-find-all-mul)
+  (map extended-find-all-commands)
   flatten
   extended-calculate)))
