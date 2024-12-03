@@ -4,9 +4,6 @@
 (def test_numbers (clojure.string/split (slurp "resources/aoc2024/d2_t") #"\n"))
 (def numbers (clojure.string/split (slurp "resources/aoc2024/d2_1") #"\n"))
 
-
-lists
-
 (defn parse-numbers [x]
   (mapv #(Integer/parseInt %) (str/split x #" ")))
 
