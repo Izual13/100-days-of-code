@@ -24,7 +24,7 @@
     :RIGHT :DOWN
     :DOWN :LEFT
     :LEFT :UP
-    :else (throw (ex-info "Циклическая зависимость обнаружена"))))
+    :else (throw (ex-info "!!!!"))))
 
 (defn calculate [m]
   (let [s (find-start m)] 
@@ -40,11 +40,8 @@
           (= n \.) (recur [new-x new-y] d (if (contains? v [new-x new-y]) r (inc r)) (conj v [new-x new-y]))
           (= n \^) (recur [new-x new-y] d (if (contains? v [new-x new-y]) r (inc r)) (conj v [new-x new-y]))
           (= n \#) (recur [i j] (next-direction d) r v)
-          :else (count v)
-          ))))))
+          :else (count v)))))))
 
-
-(direction :UP)
 
 (assert (= 41 (->> 
   test-guard-map
@@ -58,48 +55,37 @@
   calculate)))
 
 
-(def lines (str/split data #"\n"))
-
 (def grid (mapv vec guard-map))
 
-(def init-coord   (some (fn [[y row]]
-                          (when-let [x (some (fn [[x cell]]
-                                               (when (= \^ cell) x))
-                                             (map-indexed  vector row))]
-                            [y x]))
-                        (map-indexed vector grid)))
+(defn turn [y x m]
+  (case m
+    0 [(inc y) x (mod (inc m) 4)]
+    1 [y (dec x) (mod (inc m) 4)]
+    2 [(dec y) x (mod (inc m) 4)]
+    3 [y (inc x) (mod (inc m) 4)]))
 
-init-coord
+(defn advance [y x m]
+  (case m
+    0 [(dec y) x m]
+    1 [y (inc x) m]
+    2 [(inc y) x m]
+    3 [y (dec x) m]))
 
-(defn turn [cury curx move]
-  (case move
-    0 [(inc cury) curx (mod (inc move) 4)]
-    1 [cury (dec curx) (mod (inc move) 4)]
-    2 [(dec cury) curx (mod (inc move) 4)]
-    3 [cury (inc curx) (mod (inc move) 4)]))
-
-(defn advance [cury curx move]
-  (case move
-    0 [(dec cury) curx move]
-    1 [cury (inc curx) move]
-    2 [(inc cury) curx move]
-    3 [cury (dec curx) move]))
-
-(def visited (loop [cury (first init-coord)
-                    curx (second init-coord)
-                    move 0
-                    visited #{}]
-               (if (and (>= cury 0)
-                        (< cury (count grid))
-                        (>= curx 0)
-                        (< curx  (count (first grid))))
-                 (let [[cury curx move] (if (= (get-in grid [cury curx]) \#)
-                                          (turn cury curx move)
-                                          [cury curx move])
-                       seen' (conj visited [cury curx])
-                       [cury' curx' move'] (advance cury curx move)]
-                   (recur cury' curx' move' seen'))
-                 visited)))
+(def visited (loop [y (first (find-start grid))
+                    x (second (find-start grid))
+                    m 0
+                    v #{}]
+               (if (and (>= y 0)
+                        (< y (count grid))
+                        (>= x 0)
+                        (< x  (count (first grid))))
+                 (let [[y x m] (if (= (get-in grid [y x]) \#)
+                                          (turn y x m)
+                                          [y x m])
+                       v' (conj v [y x])
+                       [y' x' m'] (advance y x m)]
+                   (recur y' x' m' v'))
+                 v)))
 
 (def ans (count visited))
 
@@ -107,26 +93,25 @@ init-coord
                (map
                 (fn [[blocky blockx]]
                   (loop [ans2 0
-                         grid (assoc-in grid [blocky blockx] \#)
-                         cury (first init-coord)
-                         curx (second init-coord)
-                         move 0
-                         visited #{}]
-                    (if (and (>= cury 0)
-                             (< cury (count grid))
-                             (>= curx 0)
-                             (< curx  (count (first grid)))
+                         g (assoc-in grid [blocky blockx] \#)
+                         y (first (find-start grid))
+                         x (second (find-start grid))
+                         m 0
+                         v #{}]
+                    (if (and (>= y 0)
+                             (< y (count g))
+                             (>= x 0)
+                             (< x  (count (first g)))
                              (= 0 ans2))
-                      (let [ans2' (if (contains? visited [cury curx move]) 1 0)
-                            [cury curx move] (if (= (get-in grid [cury curx]) \#)
-                                               (turn cury curx move)
-                                               [cury curx move])
-                            seen' (conj visited [cury curx move])
-                            [cury' curx' move'] (advance cury curx move)]
-                        (recur ans2' grid cury' curx' move' seen'))
+                      (let [ans2' (if (contains? v [y x m]) 1 0)
+                            [y x m] (if (= (get-in g [y x]) \#)
+                                               (turn y x m)
+                                               [y x m])
+                            v' (conj v [y x m])
+                            [y' x' m'] (advance y x m)]
+                        (recur ans2' g y' x' m' v'))
                       ans2))))
                (reduce +)))
 
-(println ans)
-
-(println ans2)
+(assert (= 5453 ans))
+(assert (= 2188 ans2))
