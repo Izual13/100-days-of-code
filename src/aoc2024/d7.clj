@@ -34,7 +34,7 @@
   (filter identity)
   (apply +))))
 
-(defn || [n1 n2]
+(defn concatinate [n1 n2]
   (Long/parseLong (str n1 n2)))
 
 (defn try-calibrate-2 
@@ -44,10 +44,9 @@
              (nil? r) nil
              (and (= t r) (empty? n)) r
              (empty? n) nil
-             :else (let [f1 (try-calibrate-2 r (next n) (* t (first n)))
-                         f2 (try-calibrate-2 r (next n) (+ t (first n)))
-                         f3 (try-calibrate-2 r (next n) (|| t (first n)))]
-                     (if (and (nil? f1) (nil? f2) (nil? f3)) 
+             :else (let [ops [* + concatinate]
+                         f (for [i ops] (try-calibrate-2 r (next n) (i t (first n))))]
+                     (if (every? nil? f) 
                        nil
                        r)))))
 
@@ -62,3 +61,4 @@
   (mapv try-calibrate-2)
   (filter identity)
   (apply +))))
+
