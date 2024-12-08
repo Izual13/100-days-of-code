@@ -56,25 +56,14 @@
 (defn find-all-coordinates [[i1 j1] [i2 j2]] 
   (let [x (abs (- i1 i2))
         y (abs (- j1 j2))
-        coord-pred (fn [[x y]] (and (<= 0 x 49) (<= 0 y 49)))]
+        coord-pred (fn [[x y]] (and (<= 0 x 49) (<= 0 y 49)))
+        get-coords (fn [ix iy op1 op2] (take-while coord-pred (iterate (fn [[i j]] [(op1 i x) (op2 j y)]) [ix iy])))
+        ]
     (cond 
-      (and (< i1 i2) (< j1 j2)) (concat 
-                                  (take-while coord-pred (iterate (fn [[i j]] [(- i x) (- j y)]) [i1 j1]))
-                                  (take-while coord-pred (iterate (fn [[i j]] [(+ i x) (+ j y)]) [i2 j2])))
-      
-      
-      (and (> i1 i2) (> j1 j2)) (concat 
-                                  (take-while coord-pred (iterate (fn [[i j]] [(+ i x) (+ j y)]) [i1 j1]))
-                                  (take-while coord-pred (iterate (fn [[i j]] [(- i x) (- j y)]) [i2 j2])))
-      
-      (and (> i1 i2) (< j1 j2)) (concat 
-                                  (take-while coord-pred (iterate (fn [[i j]] [(+ i x) (- j y)]) [i1 j1]))
-                                  (take-while coord-pred (iterate (fn [[i j]] [(- i x) (+ j y)]) [i2 j2])))
-      
-      (and (< i1 i2) (> j1 j2)) (concat 
-                                  (take-while coord-pred (iterate (fn [[i j]] [(- i x) (+ j y)]) [i1 j1]))
-                                  (take-while coord-pred (iterate (fn [[i j]] [(+ i x) (- j y)]) [i2 j2])))
-      
+      (and (< i1 i2) (< j1 j2)) (concat (get-coords i1 j1 - -) (get-coords i2 j2 + +))
+      (and (> i1 i2) (> j1 j2)) (concat (get-coords i1 j1 + +) (get-coords i2 j2 - -))
+      (and (> i1 i2) (< j1 j2)) (concat (get-coords i1 j1 + -) (get-coords i2 j2 - +))
+      (and (< i1 i2) (> j1 j2)) (concat (get-coords i1 j1 - +) (get-coords i2 j2 + -))
       :else (throw (Exception. "!!!!")))))
 
 (defn find-all-antinodes [n]
