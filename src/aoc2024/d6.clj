@@ -9,7 +9,6 @@
 (defn find-start [m]
   (let [c (count m)]
     (loop [i 0 j 0]
-      ; (println i j (get-in m [i j]))
       (cond 
         (= j c) false
         (= i c) (recur 0 (inc j))

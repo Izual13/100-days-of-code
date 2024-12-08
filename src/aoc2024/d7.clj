@@ -17,27 +17,8 @@
              (and (= t r) (empty? n)) r
              (empty? n) nil
              :else (let [f1 (try-calibrate r (next n) (* t (first n)))
-                         f2 (try-calibrate r (next n) (+ t (first n)))
-                         ]
+                         f2 (try-calibrate r (next n) (+ t (first n)))]
                      (if (and (nil? f1) (nil? f2)) 
-                       nil
-                       r)))))
-
-(defn try-calibrate-2 
-  ([[r n]] (try-calibrate r (next n) (first n))) 
-  ([r n t] (cond 
-             (> t r) nil
-             (nil? r) nil
-             (and (= t r) (empty? n)) r
-             (empty? n) nil
-             :else (let [f1 (try-calibrate r (next n) (* t (first n)))
-                         f2 (try-calibrate r (next n) (+ t (first n)))
-                         f3 (try-calibrate r (next n) (Long/parseLong (str t (first n))))
-                         ; _ (println f1)
-                         ; _ (println f2)
-                         ; _ (println f3)
-                         ]
-                     (if (and (nil? f1) (nil? f2) (nil? f3)) 
                        nil
                        r)))))
 
@@ -53,6 +34,22 @@
   (filter identity)
   (apply +))))
 
+(defn || [n1 n2]
+  (Long/parseLong (str n1 n2)))
+
+(defn try-calibrate-2 
+  ([[r n]] (try-calibrate-2 r (next n) (first n))) 
+  ([r n t] (cond 
+             (> t r) nil
+             (nil? r) nil
+             (and (= t r) (empty? n)) r
+             (empty? n) nil
+             :else (let [f1 (try-calibrate-2 r (next n) (* t (first n)))
+                         f2 (try-calibrate-2 r (next n) (+ t (first n)))
+                         f3 (try-calibrate-2 r (next n) (|| t (first n)))]
+                     (if (and (nil? f1) (nil? f2) (nil? f3)) 
+                       nil
+                       r)))))
 
 (assert (= 11387 (->> test-equations
   (mapv parse-equation)
