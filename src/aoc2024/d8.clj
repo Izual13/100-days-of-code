@@ -6,8 +6,7 @@
 (def antennas (str/split (slurp "resources/aoc2024/d8_1") #"\n"))
 
 (defn find-frequencies [m]
-  (let [c (count m)
-        _ (println c)]
+  (let [c (count m)]
     (loop [i 0 j 0 r {}]
       (cond 
         (= j c) (dissoc r \.)
@@ -51,4 +50,47 @@
   (apply concat)
   set
   (filter (fn [[i j]] (and (<= 0 i 49) (<= 0 j 49))))
+  count)))
+
+
+(defn find-all-coordinates [[i1 j1] [i2 j2]] 
+  (let [x (abs (- i1 i2))
+        y (abs (- j1 j2))
+        coord-pred (fn [[x y]] (and (<= 0 x 49) (<= 0 y 49)))]
+    (cond 
+      (and (< i1 i2) (< j1 j2)) (concat 
+                                  (take-while coord-pred (iterate (fn [[i j]] [(- i x) (- j y)]) [i1 j1]))
+                                  (take-while coord-pred (iterate (fn [[i j]] [(+ i x) (+ j y)]) [i2 j2])))
+      
+      
+      (and (> i1 i2) (> j1 j2)) (concat 
+                                  (take-while coord-pred (iterate (fn [[i j]] [(+ i x) (+ j y)]) [i1 j1]))
+                                  (take-while coord-pred (iterate (fn [[i j]] [(- i x) (- j y)]) [i2 j2])))
+      
+      (and (> i1 i2) (< j1 j2)) (concat 
+                                  (take-while coord-pred (iterate (fn [[i j]] [(+ i x) (- j y)]) [i1 j1]))
+                                  (take-while coord-pred (iterate (fn [[i j]] [(- i x) (+ j y)]) [i2 j2])))
+      
+      (and (< i1 i2) (> j1 j2)) (concat 
+                                  (take-while coord-pred (iterate (fn [[i j]] [(- i x) (+ j y)]) [i1 j1]))
+                                  (take-while coord-pred (iterate (fn [[i j]] [(+ i x) (- j y)]) [i2 j2])))
+      
+      :else (throw (Exception. "!!!!")))))
+
+(defn find-all-antinodes [n]
+  (loop [n n r []]
+    (if (empty? n) 
+      r
+      (let [r' (for [i (next n)] (find-all-coordinates (first n) i))
+            r' (apply concat r')] 
+        (recur (next n) (apply conj r r'))))))
+
+
+(assert (= 839 (->> antennas
+  (mapv vec)
+  (find-frequencies)
+  (mapv second)
+  (map find-all-antinodes)
+  (apply concat)
+  set
   count)))
