@@ -1,5 +1,6 @@
 (ns  aoc2024.d9
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clj-async-profiler.core :as prof]))
 
 (def test-disk-map (vec (slurp "resources/aoc2024/d9_t")))
 (def disk-map (vec (slurp "resources/aoc2024/d9_1")))
@@ -36,15 +37,16 @@
       :else (recur (next m) (inc i) id (conj r {:f (first m)})))))
 
 
-
 (defn find-free-space [m s]
   (let [c (count m)]
     (loop [i 0]
-      (cond 
-        (= i c) nil
-        (contains? (get m i) :r) (recur (inc i))
-        (>= ((get m i) :f) s) i
-        :else (recur (inc i))))))
+      (if (= i c) 
+        nil
+        (let [g (get m i)]
+          (cond 
+            (contains? g :r) (recur (inc i))
+            (>= ^long (g :f) s) i
+            :else (recur (inc i))))))))
 
 (defn compact-disk [m] 
   (loop [m m r (dec (count m))] 
@@ -60,12 +62,10 @@
               (> i r) (recur m (dec r))
               (= reminder 0) (recur (-> m
                                       (assoc r {:f (f :r)})
-                                      (vec-remove i)
-                                      (vec-insert i {:r (f :r) :id (f :id)})) (dec r))
+                                      (assoc i {:r (f :r) :id (f :id)})) (dec r))
               :else (recur (-> m
                              (assoc r {:f (f :r)})
-                             (vec-remove i)
-                     		 (vec-insert i {:f reminder})
+                             (assoc i {:f reminder})
                              (vec-insert i {:r (f :r) :id (f :id)})) (dec r)))))))))
 
 (defn calculate-2 [m]
@@ -86,7 +86,25 @@
   calculate-2)))
 
 (assert (= 6469636832766 (->> disk-map
-  (mapv #(- (int %) 48))
+  (mapv #(- (long %) 48))
   parse-disk-map
   compact-disk
   calculate-2)))
+
+
+(time (->> disk-map
+  (mapv #(- (long %) 48))
+  parse-disk-map
+  compact-disk
+  calculate-2))
+
+(comment (do
+  (println "start profiling")
+  (prof/start)
+  (time (->> disk-map
+  (mapv #(- (long %) 48))
+  parse-disk-map
+  compact-disk
+  calculate-2))
+  (println (prof/stop))
+  (println "end profiling")))
