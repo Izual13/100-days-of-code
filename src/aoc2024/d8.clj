@@ -22,7 +22,7 @@
       (and (> i1 i2) (> j1 j2)) [[(+ i1 x) (+ j1 y)] [(- i2 x) (- j2 y)]]
       (and (> i1 i2) (< j1 j2)) [[(+ i1 x) (- j1 y)] [(- i2 x) (+ j2 y)]]
       (and (< i1 i2) (> j1 j2)) [[(- i1 x) (+ j1 y)] [(+ i2 x) (- j2 y)]]
-      :else (throw (ex-info "!!!!")))))
+      :else (throw (Exception "!!!!")))))
 
 (defn find-antinodes [n]
   (loop [n n r []]
