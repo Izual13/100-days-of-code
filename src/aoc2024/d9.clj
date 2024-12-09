@@ -2,8 +2,8 @@
   (:require [clojure.string :as str]
             [clj-async-profiler.core :as prof]))
 
-(def test-disk-map (vec (slurp "resources/aoc2024/d9_t")))
-(def disk-map (vec (slurp "resources/aoc2024/d9_1")))
+(def test-disk-map (slurp "resources/aoc2024/d9_t"))
+(def disk-map (slurp "resources/aoc2024/d9_1"))
 
 
 (defn vec-insert [v i e] (vec (concat (take i v) [e] (drop i v))))
@@ -54,19 +54,18 @@
       (= r 0) m
       (contains? (get m r) :f) (recur m (dec r) find-free-space-cache)
       :else (let [f (get m r)
-                  [i find-free-space-cache] (find-free-space m (f :r) find-free-space-cache)]
+                  reserved (f :r)
+                  [i find-free-space-cache] (find-free-space m reserved find-free-space-cache)]
         (if (nil? i)
           (recur m (dec r) find-free-space-cache)
-          (let [reminder (- ((get m i) :f) (f :r))]
+          (let [reminder (- ((get m i) :f) reserved)]
             (cond 
               (> i r) (recur m (dec r) find-free-space-cache)
               (= reminder 0) (recur (-> m
-                                      (assoc r {:f (f :r)})
-                                      (assoc i {:r (f :r) :id (f :id)})) (dec r) find-free-space-cache)
+                                      (assoc r {:f reserved} i {:r reserved :id (f :id)})) (dec r) find-free-space-cache)
               :else (recur (-> m
-                             (assoc r {:f (f :r)})
-                             (assoc i {:f reminder})
-                             (vec-insert i {:r (f :r) :id (f :id)})) (dec r) find-free-space-cache))))))))
+                             (assoc r {:f reserved} i {:f reminder})
+                             (vec-insert i {:r reserved :id (f :id)})) (dec r) find-free-space-cache))))))))
 
 (defn calculate-2 [m]
   (let [c (count m)]
@@ -91,12 +90,6 @@
   compact-disk
   calculate-2)))
 
-(time (->> disk-map
-  (mapv #(- (long %) 48))
-  parse-disk-map
-  compact-disk
-  calculate-2))
-
 (comment (do
   (println "start profiling")
   (prof/start)
@@ -109,4 +102,3 @@
   (println "end profiling")))
 
 (set! *warn-on-reflection* true)
-
