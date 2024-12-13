@@ -2,8 +2,6 @@
   (:require [clojure.string :as str]
             [clj-async-profiler.core :as prof]))
 
-
-
 (def test-configuration (str/split (slurp "resources/aoc2024/d13_t") #"\n\n"))
 (def configuration (str/split (slurp "resources/aoc2024/d13_1") #"\n\n"))
 
@@ -32,18 +30,11 @@
   (filterv some?)
   (apply +))))
 
-
-(defn parse-configuration-2 [c]
-  (let [[r1 r2 r3] (str/split c #"\n")
-        [_ ax ay] (re-matches #"Button A: X\+(\d*), Y\+(\d*)" r1)
-        [_ bx by] (re-matches #"Button B: X\+(\d*), Y\+(\d*)" r2)
-        [_ px py] (re-matches #"Prize: X=(\d*), Y=(\d*)" r3)] 
-        [(Long/parseLong ax) (Long/parseLong ay) (Long/parseLong bx) (Long/parseLong by) 
-         (+ 10000000000000 (Long/parseLong px)) 
-         (+ 10000000000000 (Long/parseLong py))]))
-
 (assert (= 80882098756071 (->> configuration
-  (mapv parse-configuration-2)
+  (mapv parse-configuration)
+  (mapv #(-> % 
+           (update 4 (fn [x] (+ 10000000000000 x)))
+           (update 5 (fn [x] (+ 10000000000000 x)))))
   (mapv calculate)
   (filterv some?)
   (apply +))))
