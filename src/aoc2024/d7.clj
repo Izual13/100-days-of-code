@@ -46,9 +46,7 @@
              (empty? n) nil
              :else (let [ops [* + ||]
                          f (for [i ops] (try-calibrate-2 r (next n) (i t (first n))))]
-                     (if (every? nil? f) 
-                       nil
-                       r)))))
+                     (if (every? nil? f) nil r)))))
 
 (assert (= 11387 (->> test-equations
   (mapv parse-equation)

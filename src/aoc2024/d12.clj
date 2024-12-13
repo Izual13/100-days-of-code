@@ -2,8 +2,6 @@
   (:require [clojure.string :as str]
             [clj-async-profiler.core :as prof]))
 
-
-
 (def test-region (str/split (slurp "resources/aoc2024/d12_t") #"\n"))
 (def test-region2 (str/split (slurp "resources/aoc2024/d12_t2") #"\n"))
 (def test-region3 (str/split (slurp "resources/aoc2024/d12_t3") #"\n"))

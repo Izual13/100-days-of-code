@@ -9,8 +9,6 @@
                 [0  -1]      [0  1]
                 [1  -1][1  0][1  1]])
 
-;XMAS
-
 (defn check [l [i j]]
   (loop [p positions r 0]
     (if (empty? p) r

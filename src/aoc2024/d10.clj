@@ -20,23 +20,17 @@
     (if (nil? next-score) 
       nil
       (for [c [[-1 0] [1 0] [0 -1] [0 1]]
-                :let [[x y] c
-                      ;_ (println "aaaaa" (inc next-score) (get-in m [(+ i x) (+ j y)]))
-                      ]
+                :let [[x y] c]
                 :when (= (inc next-score) (get-in m [(+ i x) (+ j y)]))] [(+ i x) (+ j y)]))))
 
 (defn find-trailheads 
   ([m] (for [i (find-zeros m)] (find-trailheads m i)))
   ([m [i j]] 
-   (let [;_ (println i j)
-         n (find-next m [i j])
-         ; _ (println "n" n i j)
-         ]
+   (let [n (find-next m [i j])]
      (cond 
        (and (or (empty? n)(nil? n)) (= (get-in m [i j]) 9)) [[i j]] 
        (or (empty? n)(nil? n)) []
-       :else (apply concat (for [i n] (find-trailheads m i)))
-       ))))
+       :else (apply concat (for [i n] (find-trailheads m i)))))))
 
 (assert (= 36 (->> test-topographic-map
   (mapv vec)

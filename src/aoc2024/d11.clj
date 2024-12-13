@@ -2,15 +2,12 @@
   (:require [clojure.string :as str]
             [clj-async-profiler.core :as prof]))
 
-
 (def test-arrangement (str/split (slurp "resources/aoc2024/d11_t") #" "))
 (def arrangement (str/split (slurp "resources/aoc2024/d11_1") #" "))
-
 
 (defn split [n]
   (let [n (str n)
         h (/ (count n) 2)] [(Long/parseLong (subs n 0 h)) (Long/parseLong (subs n h))]))
-
 
 (defn transform [m]
   (loop [m m r {}]
