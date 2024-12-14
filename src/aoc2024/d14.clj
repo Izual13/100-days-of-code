@@ -18,10 +18,7 @@
                           (str/replace  #"0" " ")
                           (str/replace  #"\d" "*"))]
           (if (str/includes? tree "*******************************")
-            (println i "\n" (-> (str/join "\n" (mapv #(str/join "" %) m))
-                          (str/replace  #"0" " ")
-                          (str/replace  #"\d" "*")) "\n\n")
-            ))
+            (println i "\n" tree "\n\n")))
         (let [f (first rs)
               [x y _ _] f] 
           (recur (next rs) (update-in m [y x] inc)))))))
