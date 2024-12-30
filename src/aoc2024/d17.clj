@@ -18,24 +18,24 @@
       {:a a :b b :c c :r r}
       (let [opcode (get p i)
             operand (get p (inc i))
-            combo-operand (case operand 
-                            0 0
-                            1 1
-                            2 2
-                            3 3
-                            4 a
-                            5 b
-                            6 c
-                            7 nil)]
+            combo (case operand 
+                    0 0
+                    1 1
+                    2 2
+                    3 3
+                    4 a
+                    5 b
+                    6 c
+                    7 nil)]
         (cond 
-          (= 0 opcode) (recur (+ 2 i) (bit-shift-right a combo-operand) b c r)
+          (= 0 opcode) (recur (+ 2 i) (bit-shift-right a combo) b c r)
           (= 1 opcode) (recur (+ 2 i) a (bit-xor b operand) c r)
-          (= 2 opcode) (recur (+ 2 i) a (mod combo-operand 8) c r)
+          (= 2 opcode) (recur (+ 2 i) a (mod combo 8) c r)
           (= 3 opcode) (if (= 0 a) (recur (+ 2 i) a b c r) (recur operand a b c r))
           (= 4 opcode) (recur (+ 2 i) a (bit-xor b c) c r)
-          (= 5 opcode) (recur (+ 2 i) a b c (conj r (mod combo-operand 8)))
-          (= 6 opcode) (recur (+ 2 i) a (bit-shift-right a combo-operand) c r)
-          (= 7 opcode) (recur (+ 2 i) a b (bit-shift-right a combo-operand) r))))))
+          (= 5 opcode) (recur (+ 2 i) a b c (conj r (mod combo 8)))
+          (= 6 opcode) (recur (+ 2 i) a (bit-shift-right a combo) c r)
+          (= 7 opcode) (recur (+ 2 i) a b (bit-shift-right a combo) r))))))
 
 
 (assert (= {:a 0, :b 0, :c 0, :r [4 6 3 5 6 3 5 2 1 0]} (->> test-info
