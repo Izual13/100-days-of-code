@@ -15,3 +15,13 @@
         (= i (count (get a j))) (recur (inc j) 0)
         (= v (get-in a [j i])) [j i]
         :else (recur j (inc i))))))
+
+
+(defn find-all [a v]
+  (let [c (count a)]
+    (loop [j 0 i 0 r #{}]
+      (cond 
+        (= j c) r
+        (= i (count (get a j))) (recur (inc j) 0 r)
+        (= v (get-in a [j i])) (recur j (inc i) (conj r [j i]))
+        :else (recur j (inc i) r)))))
