@@ -46,3 +46,56 @@
   (create-map 71)
   dijkstra)))
 
+(defn optimised-dijkstra [m]
+  (let [mi (dec (count m))
+        find-neighbours (fn [i j r] (for [[oi oj] [[-1 0][1 0][0 1][0 -1]]
+                                        :let [i' (+ i oi)
+                                              j' (+ j oj)
+                                              x (get-in m [i' j'])]
+                                        :when (and (not (nil? x)) (not= x \#))] [i' j' (inc r)]))]
+    (loop [points (sorted-set-by (fn [[a1 b1 r1] [a2 b2 r2]] (compare [r1 a1 b1] [r2 a2 b2])) [0 0 0]) v {}]
+      (cond 
+        (empty? points) (v [mi mi])
+        (not (nil? (v [mi mi]))) 1
+        :else (let [[i j r] (first points)
+                    neighbours (filter (fn [[i j r]] (let [v' (v [i j])] (or (nil? v') (< r v')))) (find-neighbours i j r))
+                    points' (disj points [i j r])
+                    tmp (v [i j])]
+                (recur (apply conj points' neighbours) (if (or (nil? tmp) (< r tmp)) (assoc v [i j] r) v)))))))
+
+(defn bruteforce[init size cb]
+  (let [m (create-map size (take init cb))] 
+    (loop [m m c (drop init cb) r init]
+      (cond
+        (empty? c) r
+        (nil? (optimised-dijkstra m)) (get cb (dec r))
+        :else (recur (assoc-in m [(first (first c)) (second (first c))] \#) (next c) (inc r))))))
+
+(assert (= "6,1" (->> test-corrupted-bytes
+  (mapv parse-byte)
+  (bruteforce 12 7)
+  reverse
+  (str/join ","))))
+
+(assert (= "52,5" (->> corrupted-bytes
+  (mapv parse-byte)
+  (bruteforce 1024 71)
+  reverse
+  (str/join ","))))
+
+
+(do
+  (println "start profiling")
+  (prof/start)
+  (time (->> corrupted-bytes
+  (mapv parse-byte)
+  (bruteforce 1024 71)))
+  (println (prof/stop))
+  (println "end profiling"))
+
+
+"Elapsed time: 172684.210037 msecs"
+"Elapsed time: 189915.364074 msecs"
+"Elapsed time: 115795.362976 msecs"
+"Elapsed time: 17240.556196 msecs"
+
